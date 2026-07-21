@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (heroVideoTrigger) {
     heroVideoTrigger.addEventListener('click', () => {
-      const defaultVideo = "Product Videos/minimalist_mirror_LED_digital__1784613410913_HD.mp4";
+      const defaultVideo = "assets/videos/video1.mp4";
       openVideoModal(defaultVideo);
     });
   }
