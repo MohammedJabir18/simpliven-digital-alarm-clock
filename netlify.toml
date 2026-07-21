@@ -1,0 +1,16 @@
+# Netlify Deployment Configuration for Simpliven Digital Alarm Clock
+
+[build]
+  publish = "."
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Access-Control-Allow-Origin = "*"
+
+[[redirects]]
+  from = "/checkout"
+  to = "https://a1vwxm-qr.myshopify.com/cart/49072796926187:1"
+  status = 302
