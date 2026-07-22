@@ -1540,3 +1540,273 @@ body.theme-dtc .sticky-buy-btn {
 .sticky-buy-btn:hover {
   transform: scale(1.03);
 }
+
+/* --------------------------------------------------------------------------
+   20. Comprehensive Mobile-First & Hero Responsiveness (Sub-768px & Sub-480px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 16px 0 25px 0;
+  }
+  
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .main-media-frame {
+    aspect-ratio: 16/10;
+    border-radius: 16px;
+  }
+
+  .badge-live-views {
+    top: 10px;
+    left: 10px;
+    padding: 4px 10px;
+    font-size: 0.7rem;
+  }
+
+  .badge-discount {
+    top: 10px;
+    right: 10px;
+    padding: 4px 10px;
+    font-size: 0.7rem;
+  }
+
+  .thumb-carousel {
+    gap: 8px;
+    margin-top: 10px;
+    padding-bottom: 6px;
+  }
+
+  .thumb {
+    width: 62px;
+    height: 62px;
+    border-radius: 10px;
+  }
+
+  .product-info-stack {
+    gap: 12px;
+  }
+
+  .product-title {
+    font-size: 1.45rem;
+    line-height: 1.25;
+  }
+
+  .product-subtitle {
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+
+  .price-row {
+    padding: 10px 14px;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .price-current {
+    font-size: 1.65rem;
+  }
+
+  .price-original {
+    font-size: 0.95rem;
+  }
+
+  .price-save {
+    font-size: 0.72rem;
+    padding: 3px 8px;
+    margin-left: auto;
+  }
+
+  .urgency-timer-box {
+    padding: 10px 12px;
+  }
+
+  .timer-label {
+    font-size: 0.78rem;
+  }
+
+  .timer-digits {
+    font-size: 0.98rem;
+  }
+
+  .color-options {
+    gap: 8px;
+  }
+
+  .color-pill {
+    flex: 1 1 0px;
+    min-width: 0;
+    padding: 8px 6px;
+    font-size: 0.78rem;
+    border-radius: 14px;
+    gap: 5px;
+  }
+
+  .color-dot {
+    width: 12px;
+    height: 12px;
+  }
+
+  .bundle-selector {
+    gap: 10px;
+  }
+
+  .bundle-card {
+    padding: 12px 14px;
+    gap: 10px;
+    border-radius: 14px;
+  }
+
+  .popular-ribbon {
+    top: -9px;
+    right: 10px;
+    font-size: 0.6rem;
+    padding: 2px 8px;
+  }
+
+  .bundle-title {
+    font-size: 0.85rem;
+  }
+
+  .bundle-desc {
+    font-size: 0.72rem;
+  }
+
+  .bundle-price {
+    font-size: 1rem;
+  }
+
+  .btn-primary-buy {
+    padding: 14px 18px;
+    font-size: 0.95rem;
+    border-radius: 14px;
+  }
+
+  .btn-primary-buy small {
+    font-size: 0.68rem;
+  }
+
+  .guarantee-grid {
+    gap: 6px;
+    font-size: 0.7rem;
+  }
+
+  .g-item {
+    padding: 8px 4px;
+  }
+
+  .g-icon {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .announcement-bar {
+    font-size: 0.7rem;
+    padding: 6px 10px;
+  }
+
+  .navbar {
+    padding: 10px 14px;
+  }
+
+  .logo-badge {
+    font-size: 1.05rem;
+  }
+
+  .product-tag {
+    font-size: 0.6rem;
+    padding: 2px 6px;
+  }
+
+  .nav-cta-btn {
+    padding: 6px 12px;
+    font-size: 0.72rem;
+  }
+
+  .style-switcher {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .switcher-title {
+    font-size: 0.75rem;
+    width: 100%;
+    text-align: center;
+  }
+
+  .vibe-btn {
+    font-size: 0.72rem;
+    padding: 4px 10px;
+    flex: 1;
+    text-align: center;
+  }
+
+  .hero-section {
+    padding: 12px 0 20px 0;
+  }
+
+  .main-media-frame {
+    aspect-ratio: 16/10;
+  }
+
+  .thumb {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+  }
+
+  .product-title {
+    font-size: 1.3rem;
+  }
+
+  .price-current {
+    font-size: 1.5rem;
+  }
+
+  .price-save {
+    font-size: 0.68rem;
+  }
+
+  .color-pill {
+    font-size: 0.72rem;
+    padding: 7px 4px;
+  }
+
+  .bundle-card {
+    padding: 10px 12px;
+  }
+
+  .bundle-title {
+    font-size: 0.8rem;
+  }
+
+  .bundle-desc {
+    font-size: 0.68rem;
+  }
+
+  .bundle-price {
+    font-size: 0.92rem;
+  }
+
+  .mobile-sticky-bar {
+    padding: 8px 14px;
+  }
+
+  .sticky-product-thumb {
+    width: 36px;
+    height: 36px;
+  }
+
+  .s-price {
+    font-size: 1rem;
+  }
+
+  .sticky-buy-btn {
+    padding: 10px 18px;
+    font-size: 0.82rem;
+  }
+}
+
