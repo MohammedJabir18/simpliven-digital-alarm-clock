@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Simpliven™ | Digital LED Mirror Alarm Clock - Official Store</title>
   
   <!-- Google Analytics Tag -->
@@ -11,20 +11,19 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-9485GWMVDH');
   </script>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=Space+Grotesk:wght@500;700;800&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="index.css">
 </head>
-<body class="theme-cyber">
+<body class="theme-dtc">
 
-  <!-- 1. Announcement Bar Ticker -->
+  <!-- 1. Dynamic Announcement Bar Ticker -->
   <div class="announcement-bar">
     <div class="announcement-track">
       <span>⚡ FLASH SALE: FREE EXPRESS SHIPPING & CASH ON DELIVERY AVAILABLE TODAY</span>
@@ -36,7 +35,7 @@
     </div>
   </div>
 
-  <!-- 2. Navbar -->
+  <!-- 2. Header Navbar -->
   <header class="navbar">
     <div class="nav-container">
       <div class="brand">
@@ -53,33 +52,69 @@
     </div>
   </header>
 
-  <!-- Live Style Switcher Toolbar -->
+  <!-- 3. Live Design Vibe Switcher -->
   <div class="style-switcher">
     <span class="switcher-title">🎨 Live Design Vibe:</span>
-    <button class="vibe-btn active" onclick="setTheme('cyber', this)">1. Tech-Cyber OLED</button>
+    <button class="vibe-btn" onclick="setTheme('cyber', this)">1. Tech-Cyber OLED</button>
     <button class="vibe-btn" onclick="setTheme('luxury', this)">2. Luxury Aesthetic</button>
-    <button class="vibe-btn" onclick="setTheme('dtc', this)">3. High-Conversion DTC</button>
+    <button class="vibe-btn active" onclick="setTheme('dtc', this)">3. High-Conversion DTC</button>
   </div>
 
   <main>
-    <!-- 3. Mobile Hero Media Stage -->
+    <!-- HERO TRANSFORMED SECTION (Awwwards-Tier Mobile Story Layout) -->
     <section class="hero-section">
       <div class="container">
+        
+        <!-- Mobile Hero Title Header (Above Media) -->
+        <div class="hero-mobile-header">
+          <div class="trust-badge-row">
+            <span class="pill-tag">✨ #1 BESTSELLER IN SMART DECOR</span>
+            <span class="pill-stock">⚡ IN STOCK - SHIPS IN 24 HOURS</span>
+          </div>
+          <h1 class="product-title">Simpliven™ Ultra-Clear Mirror LED Smart Clock</h1>
+          <p class="product-subtitle">HD Vanity Mirror • Auto-Night Dimmer • Real-Time Temp (°C/°F) • Dual Power</p>
+        </div>
+
         <div class="hero-grid">
           
           <!-- Hero Stage & Thumbnails Carousel -->
           <div class="product-stage">
-            <div class="main-media-frame">
+            
+            <!-- Interactive Live Display Mode Switcher Controls -->
+            <div class="display-mode-bar">
+              <button class="mode-btn active" onclick="setDisplayMode('day', this)">☀️ Day Mode</button>
+              <button class="mode-btn" onclick="setDisplayMode('night', this)">🌙 Night Dimmer</button>
+              <button class="mode-btn" onclick="setDisplayMode('mirror', this)">🪞 Vanity Mirror</button>
+            </div>
+
+            <!-- Main Vertical Video & Image Stage -->
+            <div class="main-media-frame" id="media-frame">
               <video id="hero-video" autoplay loop muted playsinline poster="assets/images/hero.png">
                 <source src="assets/videos/video1.mp4" type="video/mp4">
               </video>
+              
+              <!-- Badges Overlay -->
               <div class="badge-live-views">
-                <span class="dot-live"></span> <span>248 people viewing this now</span>
+                <span class="dot-live"></span> <span>248 watching live</span>
               </div>
               <div class="badge-discount">-63% OFF TODAY</div>
+
+              <!-- Interactive Feature Hotspots Overlay -->
+              <div class="hotspot hotspot-mirror" onclick="showHotspotInfo('mirror')" title="HD Vanity Mirror Finish">
+                <span class="hotspot-pulse"></span>
+                <span class="hotspot-label">🪞 Vanity Mirror</span>
+              </div>
+              <div class="hotspot hotspot-temp" onclick="showHotspotInfo('temp')" title="Real-Time Temp Sensing">
+                <span class="hotspot-pulse"></span>
+                <span class="hotspot-label">🌡️ Room Temp</span>
+              </div>
+              <div class="hotspot hotspot-dimmer" onclick="showHotspotInfo('dimmer')" title="Auto Night Dimmer">
+                <span class="hotspot-pulse"></span>
+                <span class="hotspot-label">🌙 Night Mode</span>
+              </div>
             </div>
 
-            <!-- 4. Thumbnails Carousel -->
+            <!-- Thumbnails Horizontal Carousel -->
             <div class="thumb-carousel">
               <div class="thumb active" onclick="switchMedia('video', 'assets/videos/video1.mp4', this)">
                 <video src="assets/videos/video1.mp4" muted playsinline></video>
@@ -141,28 +176,42 @@
 
           <!-- Product Details & High Conversion Buy Stack -->
           <div class="product-info-stack">
-            <div class="trust-badge-row">
-              <span class="pill-tag">✨ #1 BESTSELLER IN SMART DECOR</span>
-              <span class="pill-stock">⚡ IN STOCK - SHIPS IN 24 HOURS</span>
+            
+            <!-- Desktop Header Title -->
+            <div class="hero-desktop-header">
+              <div class="trust-badge-row">
+                <span class="pill-tag">✨ #1 BESTSELLER IN SMART DECOR</span>
+                <span class="pill-stock">⚡ IN STOCK - SHIPS IN 24 HOURS</span>
+              </div>
+              <h1 class="product-title">Simpliven™ Ultra-Clear Mirror LED Smart Digital Clock</h1>
+              <p class="product-subtitle">Dual Brightness • Real-time Temperature • HD Mirror Reflection • Dual USB & Battery Power</p>
             </div>
 
-            <h1 class="product-title">Simpliven™ Ultra-Clear Mirror LED Smart Digital Clock</h1>
-            <p class="product-subtitle">Dual Brightness • Real-time Temperature • HD Mirror Reflection • Dual USB & Battery Power</p>
+            <!-- Live Stock Progress Bar -->
+            <div class="stock-progress-box">
+              <div class="stock-progress-label">
+                <span>🔥 Almost Sold Out: <strong>92% Claimed</strong></span>
+                <span>Only 14 units left at Rs 220</span>
+              </div>
+              <div class="stock-progress-track">
+                <div class="stock-progress-fill" style="width: 92%;"></div>
+              </div>
+            </div>
 
-            <!-- 5. Price & Urgency Stack -->
+            <!-- Price Stack -->
             <div class="price-row">
               <span class="price-current">Rs 220</span>
               <span class="price-original">Rs 599</span>
               <span class="price-save">Save 63% (Rs 379 OFF)</span>
             </div>
 
-            <!-- Countdown Timer -->
+            <!-- Urgency Countdown Timer -->
             <div class="urgency-timer-box">
               <div class="timer-label">⏰ Flash Sale ends in:</div>
               <div class="timer-digits" id="timer">09m : 42s : 18ms</div>
             </div>
 
-            <!-- 6. Finish Color Selector -->
+            <!-- Finish Color Selector -->
             <div class="option-selector">
               <label class="selector-label">Finish Color: <strong id="selected-color">Obsidian Black</strong></label>
               <div class="color-options">
@@ -178,7 +227,7 @@
               </div>
             </div>
 
-            <!-- 7. Bundle Builder Cards -->
+            <!-- Bundle Builder Stack -->
             <div class="bundle-selector" id="buy-now">
               <div class="bundle-card active" onclick="selectBundle('single', this)">
                 <div class="bundle-radio"><input type="radio" name="bundle" checked></div>
@@ -200,7 +249,7 @@
               </div>
             </div>
 
-            <!-- 8. Main CTA & Guarantee Grid -->
+            <!-- Primary Buy CTA & Risk Reversal -->
             <div class="cta-action-group">
               <button class="btn-primary-buy" onclick="triggerCheckout(this)">
                 <span>⚡ BUY NOW - CASH ON DELIVERY AVAILABLE</span>
@@ -228,7 +277,7 @@
       </div>
     </section>
 
-    <!-- 9. Problem vs Solution Section -->
+    <!-- Problem vs Solution Section -->
     <section class="problem-solution-section">
       <div class="container">
         <div class="section-header">
@@ -260,7 +309,7 @@
       </div>
     </section>
 
-    <!-- 10. Feature Grid -->
+    <!-- Feature Grid Section -->
     <section class="features-section">
       <div class="container">
         <div class="section-header">
@@ -304,7 +353,7 @@
       </div>
     </section>
 
-    <!-- 11. UGC Video Carousel -->
+    <!-- UGC Video Carousel -->
     <section class="ugc-section">
       <div class="container">
         <div class="section-header">
@@ -364,7 +413,7 @@
       </div>
     </section>
 
-    <!-- 12. Verified Customer Reviews Block -->
+    <!-- Verified Customer Reviews Block -->
     <section class="reviews-section">
       <div class="container">
         <div class="reviews-summary-card">
@@ -432,7 +481,7 @@
       </div>
     </section>
 
-    <!-- 13. FAQ Accordion -->
+    <!-- FAQ Accordion -->
     <section class="faq-section">
       <div class="container">
         <div class="section-header">
@@ -486,7 +535,7 @@
 
   </main>
 
-  <!-- 14. Mobile Floating Sticky Bottom Bar -->
+  <!-- Mobile Floating Sticky Bottom Bar -->
   <div class="mobile-sticky-bar">
     <div class="sticky-product-thumb">
       <img src="assets/images/hero.png" alt="Simpliven Clock Thumbnail">

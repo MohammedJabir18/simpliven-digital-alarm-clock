@@ -367,10 +367,57 @@ body.theme-dtc .vibe-btn:hover {
 }
 
 /* --------------------------------------------------------------------------
+/* --------------------------------------------------------------------------
    7. Hero Section & Media Stage
    -------------------------------------------------------------------------- */
 .hero-section {
   padding: 35px 0;
+}
+
+.hero-mobile-header { display: none; }
+.hero-desktop-header { display: flex; flex-direction: column; gap: 12px; }
+
+@media (max-width: 900px) {
+  .hero-mobile-header { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+  .hero-desktop-header { display: none; }
+}
+
+/* Display Mode Switcher Controls */
+.display-mode-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  background: var(--bg-surface);
+  padding: 6px;
+  border-radius: 16px;
+  border: 1px solid var(--border-glass);
+}
+body.theme-dtc .display-mode-bar {
+  background: #f1f5f9;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+}
+.mode-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.mode-btn.active, .mode-btn:hover {
+  background: var(--bg-card);
+  color: var(--text-main);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+body.theme-dtc .mode-btn.active {
+  background: #ffffff;
+  color: #ff3b30;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
 }
 
 .hero-grid {
@@ -400,6 +447,90 @@ body.theme-dtc .vibe-btn:hover {
   border: 1px solid var(--border-glass);
   box-shadow: var(--shadow-card);
   aspect-ratio: 4/3;
+  transition: filter 0.4s ease, opacity 0.4s ease;
+}
+
+/* Feature Hotspots Overlay */
+.hotspot {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.hotspot:hover {
+  transform: scale(1.08);
+  background: rgba(0, 0, 0, 0.9);
+}
+.hotspot-mirror { top: 22%; left: 8%; }
+.hotspot-temp { top: 48%; right: 8%; }
+.hotspot-dimmer { bottom: 18%; left: 16%; }
+
+.hotspot-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 10px var(--accent-cyan);
+  animation: pulse 1.5s infinite;
+}
+body.theme-dtc .hotspot-pulse {
+  background: #ff3b30;
+  box-shadow: 0 0 10px #ff3b30;
+}
+.hotspot-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+/* Stock Progress Bar Box */
+.stock-progress-box {
+  background: rgba(255, 183, 3, 0.1);
+  border: 1px solid rgba(255, 183, 3, 0.3);
+  padding: 10px 14px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+body.theme-dtc .stock-progress-box {
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+}
+.stock-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+body.theme-dtc .stock-progress-label {
+  color: #92400e;
+}
+.stock-progress-track {
+  width: 100%;
+  height: 7px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  overflow: hidden;
+}
+body.theme-dtc .stock-progress-track {
+  background: #fef08a;
+}
+.stock-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff9500, #ff3b30);
+  border-radius: 10px;
 }
 
 body.theme-dtc .main-media-frame {

@@ -25,6 +25,42 @@ function setTheme(themeName, element) {
   }
 }
 
+// Display Mode Switcher (Day / Night / Mirror)
+function setDisplayMode(mode, element) {
+  const targetEl = resolveElement(element);
+  document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+  if (targetEl) {
+    const btn = targetEl.closest('.mode-btn') || targetEl;
+    btn.classList.add('active');
+  }
+
+  const frame = document.getElementById('media-frame');
+  if (!frame) return;
+
+  if (mode === 'day') {
+    frame.style.filter = 'brightness(1) contrast(1)';
+    frame.style.opacity = '1';
+  } else if (mode === 'night') {
+    frame.style.filter = 'brightness(0.55) contrast(1.1)';
+    frame.style.opacity = '0.9';
+  } else if (mode === 'mirror') {
+    frame.style.filter = 'grayscale(0.3) brightness(1.1) contrast(1.2)';
+    frame.style.opacity = '1';
+  }
+}
+
+// Hotspot Info Toast
+function showHotspotInfo(feature) {
+  if (feature === 'mirror') {
+    alert("🪞 HD Vanity Mirror Finish:\nWhen turned off or dimmed, the crystal-clear display doubles as an elegant vanity mirror for makeup and grooming.");
+  } else if (feature === 'temp') {
+    alert("🌡️ Smart Room Temperature Sensor:\nTracks room ambient temperature in real time (°C / °F), keeping your sleep and work space optimal.");
+  } else if (feature === 'dimmer') {
+    alert("🌙 Auto Night-Dimmer Mode:\nAutomatically dims brightness by 70% between 18:00 and 06:00 to prevent night eye strain.");
+  }
+}
+
+
 // Step 1: Media Switcher for Hero Stage
 function switchMedia(type, src, element) {
   const targetEl = resolveElement(element);
