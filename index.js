@@ -1,18 +1,33 @@
+// Helper to cleanly resolve target element from passed parameter (Element or Event) or global fallback
+function resolveElement(elementOrEvent) {
+  if (!elementOrEvent) {
+    return (typeof window !== 'undefined' && window.event) ? (window.event.currentTarget || window.event.target || null) : null;
+  }
+  if (elementOrEvent instanceof Element || (typeof elementOrEvent === 'object' && elementOrEvent.nodeType === 1)) {
+    return elementOrEvent;
+  }
+  if (typeof elementOrEvent === 'object' && (elementOrEvent.currentTarget || elementOrEvent.target)) {
+    return elementOrEvent.currentTarget || elementOrEvent.target;
+  }
+  return (typeof window !== 'undefined' && window.event) ? (window.event.currentTarget || window.event.target || null) : null;
+}
+
 // Theme Switcher Function
 function setTheme(themeName, element) {
   document.body.className = '';
   document.body.classList.add('theme-' + themeName);
 
   document.querySelectorAll('.vibe-btn').forEach(btn => btn.classList.remove('active'));
-  const targetEl = element || (typeof event !== 'undefined' ? (event.currentTarget || event.target) : null);
+  const targetEl = resolveElement(element);
   if (targetEl) {
-    targetEl.classList.add('active');
+    const btn = targetEl.closest('.vibe-btn') || targetEl;
+    btn.classList.add('active');
   }
 }
 
 // Step 1: Media Switcher for Hero Stage
 function switchMedia(type, src, element) {
-  const targetEl = element || (typeof event !== 'undefined' ? (event.currentTarget || event.target) : null);
+  const targetEl = resolveElement(element);
   if (targetEl) {
     const thumbContainer = targetEl.closest('.thumb') || targetEl;
     document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
@@ -41,10 +56,11 @@ function switchMedia(type, src, element) {
 
 // Step 2: Color Finish Selector
 function selectColor(colorName, element) {
-  const targetEl = element || (typeof event !== 'undefined' ? (event.currentTarget || event.target) : null);
+  const targetEl = resolveElement(element);
   document.querySelectorAll('.color-pill').forEach(el => el.classList.remove('active'));
   if (targetEl) {
-    targetEl.classList.add('active');
+    const pillEl = targetEl.closest('.color-pill') || targetEl;
+    pillEl.classList.add('active');
   }
   const selectedColorEl = document.getElementById('selected-color');
   if (selectedColorEl) {
@@ -54,7 +70,7 @@ function selectColor(colorName, element) {
 
 // Step 3: Bundle Builder
 function selectBundle(bundleType, element) {
-  const targetEl = element || (typeof event !== 'undefined' ? (event.currentTarget || event.target) : null);
+  const targetEl = resolveElement(element);
   
   document.querySelectorAll('.bundle-card').forEach(card => {
     card.classList.remove('active');
@@ -89,32 +105,48 @@ function selectBundle(bundleType, element) {
 }
 
 // Step 4: Live Millisecond Countdown Timer
-let totalMs = (9 * 60 + 42) * 1000 + 180;
-function startTimer() {
+let timerInterval = null;
+const DEFAULT_DURATION_MS = (9 * 60 + 42) * 1000 + 180;
+
+function startTimer(durationMs = DEFAULT_DURATION_MS) {
   const timerEl = document.getElementById('timer');
   if (!timerEl) return;
 
-  setInterval(() => {
-    if (totalMs > 0) {
-      totalMs -= 10;
-    }
-    if (totalMs < 0) totalMs = 0;
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
 
-    const mins = Math.floor(totalMs / 60000);
-    const secs = Math.floor((totalMs % 60000) / 1000);
-    const ms = Math.floor((totalMs % 1000) / 10);
+  const endTime = Date.now() + durationMs;
+
+  const updateTimer = () => {
+    let remainingMs = endTime - Date.now();
+    if (remainingMs <= 0) {
+      remainingMs = 0;
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    const mins = Math.floor(remainingMs / 60000);
+    const secs = Math.floor((remainingMs % 60000) / 1000);
+    const ms = Math.floor((remainingMs % 1000) / 10);
 
     const formattedMins = String(mins).padStart(2, '0');
     const formattedSecs = String(secs).padStart(2, '0');
     const formattedMs = String(ms).padStart(2, '0');
 
     timerEl.innerText = `${formattedMins}m : ${formattedSecs}s : ${formattedMs}ms`;
-  }, 10);
+  };
+
+  updateTimer();
+  timerInterval = setInterval(updateTimer, 50);
 }
 
 // Step 5: Checkout Trigger Function
 function triggerCheckout(element) {
-  const targetEl = element || (typeof event !== 'undefined' ? (event.currentTarget || event.target) : null);
+  const targetEl = resolveElement(element);
   const isSticky = targetEl && (targetEl.classList.contains('sticky-buy-btn') || targetEl.closest('.mobile-sticky-bar'));
 
   if (isSticky) {

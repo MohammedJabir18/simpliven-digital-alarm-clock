@@ -56,9 +56,9 @@
   <!-- Live Style Switcher Toolbar -->
   <div class="style-switcher">
     <span class="switcher-title">🎨 Live Design Vibe:</span>
-    <button class="vibe-btn active" onclick="setTheme('cyber')">1. Tech-Cyber OLED</button>
-    <button class="vibe-btn" onclick="setTheme('luxury')">2. Luxury Aesthetic</button>
-    <button class="vibe-btn" onclick="setTheme('dtc')">3. High-Conversion DTC</button>
+    <button class="vibe-btn active" onclick="setTheme('cyber', this)">1. Tech-Cyber OLED</button>
+    <button class="vibe-btn" onclick="setTheme('luxury', this)">2. Luxury Aesthetic</button>
+    <button class="vibe-btn" onclick="setTheme('dtc', this)">3. High-Conversion DTC</button>
   </div>
 
   <main>
@@ -202,7 +202,7 @@
 
             <!-- 8. Main CTA & Guarantee Grid -->
             <div class="cta-action-group">
-              <button class="btn-primary-buy" onclick="triggerCheckout()">
+              <button class="btn-primary-buy" onclick="triggerCheckout(this)">
                 <span>⚡ BUY NOW - CASH ON DELIVERY AVAILABLE</span>
                 <small>30-Day Money Back Guarantee • Fast Free Shipping</small>
               </button>
