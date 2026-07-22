@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simpliven Cyberpunk | Tech-Minimalist OLED Storefront</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body class="theme-cyber">
+  <div class="announcement-bar">
+    <div class="announcement-track">
+      <span>⚡ FUTURE EDITION: CYBERPUNK LED MIRROR CLOCK</span>
+      <span>🔥 14,200+ UNITS DELIVERED WORLDWIDE</span>
+      <span>🔒 30-DAY RISK-FREE GUARANTEE</span>
+    </div>
+  </div>
+
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand">
+        <span class="logo-badge">SIMPLIVEN CYBER</span>
+        <span class="product-tag">OLED v2</span>
+      </div>
+      <div class="nav-actions">
+        <div class="rating-badge">
+          <span class="stars">★★★★★</span>
+          <span class="rating-val">4.9/5 (1,420+)</span>
+        </div>
+        <a href="#buy-now" class="nav-cta-btn">BUY CYBER CLOCK</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero-section">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="product-stage">
+            <div class="main-media-frame">
+              <video id="hero-video" autoplay loop muted playsinline poster="assets/images/hero.png">
+                <source src="assets/videos/video1.mp4" type="video/mp4">
+              </video>
+              <div class="badge-live-views"><span class="dot-live"></span> <span>248 Cyber Enthusiasts Viewing</span></div>
+              <div class="badge-discount">-60% OFF</div>
+            </div>
+            <div class="thumb-carousel">
+              <div class="thumb active" onclick="switchMedia('video', 'assets/videos/video1.mp4')"><video src="assets/videos/video1.mp4" muted playsinline></video></div>
+              <div class="thumb" onclick="switchMedia('image', 'assets/images/hero.png')"><img src="assets/images/hero.png"></div>
+              <div class="thumb" onclick="switchMedia('video', 'assets/videos/video3.mp4')"><video src="assets/videos/video3.mp4" muted playsinline></video></div>
+              <div class="thumb" onclick="switchMedia('image', 'assets/images/close-up.png')"><img src="assets/images/close-up.png"></div>
+            </div>
+          </div>
+
+          <div class="product-info-stack">
+            <div class="trust-badge-row">
+              <span class="pill-tag">⚡ TECH-GADGET CHOICE</span>
+              <span class="pill-stock">🟢 IN STOCK</span>
+            </div>
+
+            <h1 class="product-title">Simpliven Cyber™ OLED Mirror LED Smart Clock</h1>
+            <p class="product-subtitle">Neon Glow LED • Real-time Temp • Smart Night Dimmer • Dual Power Mode</p>
+
+            <div class="price-row">
+              <span class="price-current">Rs 220</span>
+              <span class="price-original">Rs 599</span>
+              <span class="price-save">Save 63%</span>
+            </div>
+
+            <div class="bundle-selector" id="buy-now">
+              <div class="bundle-card active">
+                <div class="bundle-title">SINGLE CYBER EDITION</div>
+                <div class="bundle-desc">1x Mirror LED Clock + Type-C USB Cable</div>
+                <div class="bundle-price">Rs 220</div>
+              </div>
+            </div>
+
+            <button class="btn-primary-buy" onclick="triggerCheckout()">
+              <span>⚡ ORDER NOW - CYBER EDITION</span>
+              <small>Free Express Shipping • Cash on Delivery</small>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="mobile-sticky-bar">
+    <div class="sticky-price-info">
+      <span class="s-label">Simpliven Cyber</span>
+      <span class="s-price">Rs 220 <del>Rs 599</del></span>
+    </div>
+    <button class="sticky-buy-btn" onclick="triggerCheckout()">BUY NOW ⚡</button>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>
