@@ -81,59 +81,59 @@
 
             <!-- 4. Thumbnails Carousel -->
             <div class="thumb-carousel">
-              <div class="thumb active" onclick="switchMedia('video', 'assets/videos/video1.mp4')">
+              <div class="thumb active" onclick="switchMedia('video', 'assets/videos/video1.mp4', this)">
                 <video src="assets/videos/video1.mp4" muted playsinline></video>
                 <span class="play-icon">▶</span>
               </div>
-              <div class="thumb" onclick="switchMedia('video', 'assets/videos/video2.mp4')">
+              <div class="thumb" onclick="switchMedia('video', 'assets/videos/video2.mp4', this)">
                 <video src="assets/videos/video2.mp4" muted playsinline></video>
                 <span class="play-icon">▶</span>
               </div>
-              <div class="thumb" onclick="switchMedia('video', 'assets/videos/video3.mp4')">
+              <div class="thumb" onclick="switchMedia('video', 'assets/videos/video3.mp4', this)">
                 <video src="assets/videos/video3.mp4" muted playsinline></video>
                 <span class="play-icon">▶</span>
               </div>
-              <div class="thumb" onclick="switchMedia('video', 'assets/videos/video4.mp4')">
+              <div class="thumb" onclick="switchMedia('video', 'assets/videos/video4.mp4', this)">
                 <video src="assets/videos/video4.mp4" muted playsinline></video>
                 <span class="play-icon">▶</span>
               </div>
-              <div class="thumb" onclick="switchMedia('video', 'assets/videos/video5.mp4')">
+              <div class="thumb" onclick="switchMedia('video', 'assets/videos/video5.mp4', this)">
                 <video src="assets/videos/video5.mp4" muted playsinline></video>
                 <span class="play-icon">▶</span>
               </div>
-              <div class="thumb" onclick="switchMedia('video', 'assets/videos/video6.mp4')">
+              <div class="thumb" onclick="switchMedia('video', 'assets/videos/video6.mp4', this)">
                 <video src="assets/videos/video6.mp4" muted playsinline></video>
                 <span class="play-icon">▶</span>
               </div>
-              <div class="thumb" onclick="switchMedia('video', 'assets/videos/video7.mp4')">
+              <div class="thumb" onclick="switchMedia('video', 'assets/videos/video7.mp4', this)">
                 <video src="assets/videos/video7.mp4" muted playsinline></video>
                 <span class="play-icon">▶</span>
               </div>
-              <div class="thumb" onclick="switchMedia('video', 'assets/videos/video8.mp4')">
+              <div class="thumb" onclick="switchMedia('video', 'assets/videos/video8.mp4', this)">
                 <video src="assets/videos/video8.mp4" muted playsinline></video>
                 <span class="play-icon">▶</span>
               </div>
-              <div class="thumb" onclick="switchMedia('video', 'assets/videos/video9.mp4')">
+              <div class="thumb" onclick="switchMedia('video', 'assets/videos/video9.mp4', this)">
                 <video src="assets/videos/video9.mp4" muted playsinline></video>
                 <span class="play-icon">▶</span>
               </div>
-              <div class="thumb" onclick="switchMedia('video', 'assets/videos/video10.mp4')">
+              <div class="thumb" onclick="switchMedia('video', 'assets/videos/video10.mp4', this)">
                 <video src="assets/videos/video10.mp4" muted playsinline></video>
                 <span class="play-icon">▶</span>
               </div>
-              <div class="thumb" onclick="switchMedia('image', 'assets/images/hero.png')">
+              <div class="thumb" onclick="switchMedia('image', 'assets/images/hero.png', this)">
                 <img src="assets/images/hero.png" alt="Hero View">
               </div>
-              <div class="thumb" onclick="switchMedia('image', 'assets/images/close-up.png')">
+              <div class="thumb" onclick="switchMedia('image', 'assets/images/close-up.png', this)">
                 <img src="assets/images/close-up.png" alt="Close Up View">
               </div>
-              <div class="thumb" onclick="switchMedia('image', 'assets/images/lifestyle.png')">
+              <div class="thumb" onclick="switchMedia('image', 'assets/images/lifestyle.png', this)">
                 <img src="assets/images/lifestyle.png" alt="Lifestyle View">
               </div>
-              <div class="thumb" onclick="switchMedia('image', 'assets/images/features.png')">
+              <div class="thumb" onclick="switchMedia('image', 'assets/images/features.png', this)">
                 <img src="assets/images/features.png" alt="Features Overview">
               </div>
-              <div class="thumb" onclick="switchMedia('image', 'assets/images/problem-solution.png')">
+              <div class="thumb" onclick="switchMedia('image', 'assets/images/problem-solution.png', this)">
                 <img src="assets/images/problem-solution.png" alt="Mirror Finish View">
               </div>
             </div>
@@ -495,7 +495,7 @@
       <span class="s-label">Simpliven Mirror LED</span>
       <span class="s-price">Rs 220 <del>Rs 599</del></span>
     </div>
-    <button class="sticky-buy-btn" onclick="triggerCheckout()">BUY NOW ⚡</button>
+    <button class="sticky-buy-btn" onclick="triggerCheckout(this)">BUY NOW ⚡</button>
   </div>
 
   <script src="index.js"></script>
