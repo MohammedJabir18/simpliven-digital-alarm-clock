@@ -1,29 +1,16 @@
+# Netlify Deployment Configuration for Simpliven Digital Alarm Clock
+
 [build]
   publish = "."
 
-# Caching headers for asset images
-[[headers]]
-  for = "/assets/images/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-# Caching headers for asset videos
-[[headers]]
-  for = "/assets/videos/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-# Security and default headers for all routes
 [[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Access-Control-Allow-Origin = "*"
 
-# SPA fallback redirect rule
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+  from = "/checkout"
+  to = "https://a1vwxm-qr.myshopify.com/cart/49072796926187:1"
+  status = 302

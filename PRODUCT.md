@@ -7,13 +7,13 @@
 
 ## Core Pricing Rules
 * **Base Default Prepaid Price**: ₹799.00 (Best value with instant UPI checkout discount)
-* **Partial COD Price**: ₹829.00 (₹199 Advance Deposit + ₹630 Cash on Delivery)
-* **Full COD Price**: ₹959.00 (Cash on Delivery at doorstep)
-* **Compare-at MRP**: ₹1,999.00 (60% Discount Anchor)
+- **Compare-at Price (MRP)**: ₹1,999.00 (60% Discount Anchor)
 
-## Design System & Aesthetics
-* **Theme**: Obsidian Dark Mode (`#0b0f17`) with Neon Cyan/Emerald LED Glow (`#00f2fe`).
-* **Typography**: Clean, readable sans-serif system stack (Inter, system-ui).
+## Key Directives for Development & Marketing
+- **Single-Product Funnel Optimization**: Tailor all theme sections, landing page layouts, header/navigation, product page elements, and cart drawer specifically for a high-converting single-product store experience.
+- **India E-Commerce Best Practices**: Prioritize UPI fast checkout, COD trust signals, RTO (Return to Origin) reduction strategies, WhatsApp support buttons, 7-Day Easy Replacement badges, and pan-India shipping highlights.
+- **SEO/AEO/GEO Alignment**: Maintain structured entity consistency across ChatGPT, Perplexity, Gemini, and Google Search.
+
 * **Media Assets**:
-  * 8 High-resolution product images in `Product Images/`
-  * 10 HD Product Video clips in `Product Videos/`
+  * 8 High-resolution product images in `assets/images/`
+  * 10 HD Product Video clips in `assets/videos/`
