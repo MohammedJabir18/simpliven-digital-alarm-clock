@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // App Global State
 const appState = {
-    selectedBundle: 2, // Default: 2x Dual Bedroom Pack
+    selectedBundle: 1, // Default: 1x Single Setup
     selectedColor: 'emerald', // Default LED color
     paymentMode: 'prepaid', // 'prepaid' | 'full_cod'
     prices: {
