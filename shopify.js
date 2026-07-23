@@ -5,7 +5,7 @@
 
 // Storefront Configuration
 const SHOPIFY_CONFIG = {
-  storeDomain: (typeof window !== 'undefined' && window.location && window.location.hostname.includes('myshopify.com')) ? window.location.hostname : "a1vwxm-qr.myshopify.com",
+  storeDomain: "a1vwxm-qr.myshopify.com", // Always use Shopify store domain — never derive from current hostname
   productId: "9823593169131",
   defaultVariantId: "49072796926187",
   productHandle: "simpliven™-smart-led-mirror-alarm-clock-large-digital-display-temperature-display-usb-powered-modern-bedside-table-clock-for-bedroom-office-study",
@@ -63,7 +63,9 @@ function generateShopifyCheckoutUrl(variantId, quantity, paymentMode) {
   var vId = variantId || DEFAULT_VARIANT_ID;
   var qty = (typeof quantity === 'number' && quantity > 0) ? quantity : 1;
   var mode = paymentMode || 'prepaid';
-  var domain = (typeof window !== 'undefined' && window.SHOPIFY_STORE_DOMAIN) || SHOPIFY_STORE_DOMAIN;
+  // Always use the hardcoded Shopify config domain — never window.SHOPIFY_STORE_DOMAIN
+  // which could incorrectly resolve to the Netlify/CDN hostname.
+  var domain = SHOPIFY_CONFIG.storeDomain;
   
   return `https://${domain}/cart/${vId}:${qty}?discount=PREPAID60&checkout[payment_mode]=${mode}`;
 }
