@@ -627,7 +627,7 @@ function initNavScroll() {
     if (buyBtn) {
         buyBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            const target = document.getElementById('bundle-selector');
+            const target = document.getElementById('hero-checkout-trigger') || document.getElementById('bundle-selector');
             if (target) {
                 target.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 const trigger = document.getElementById('hero-checkout-trigger');
