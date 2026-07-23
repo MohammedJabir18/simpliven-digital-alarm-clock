@@ -7,10 +7,10 @@
     --bg-card-rgb: 255, 255, 255;
     --text-light: #1c1917; /* Deep Slate Charcoal font contrast */
     --text-muted: #78716c; /* Warm Slate grey */
-    --prestige-gold: #5b1a30; /* Dark Wine Burgundy primary conversion accent */
-    --prestige-gold-rgb: 91, 26, 48;
-    --gold-hover: #4a1426; /* Darker burgundy on hover */
-    --gold-glow: rgba(91, 26, 48, 0.08);
+    --prestige-gold: #FF4000; /* Vibrant Flame Orange primary conversion accent */
+    --prestige-gold-rgb: 255, 64, 0;
+    --gold-hover: #e03800; /* Darker flame orange on hover */
+    --gold-glow: rgba(255, 64, 0, 0.12);
     --border-color: rgba(0, 0, 0, 0.06); /* Thin borders */
     --border-thick: 2px solid var(--prestige-gold);
     --border-thin: 1px solid var(--border-color);
@@ -20,9 +20,9 @@
     --transition-speed: 0.3s;
     --border-radius: 12px;
     --border-radius-sm: 8px;
-    --btn-text: #ffffff; /* High contrast white text on burgundy button */
+    --btn-text: #ffffff; /* High contrast white text on accent button */
     --badge-after-text: #ffffff;
-    --text-accent: #5b1a30; /* Burgundy accents */
+    --text-accent: #FF4000; /* Vibrant Orange accents */
 }
 
 * {
@@ -1368,7 +1368,7 @@ h1, h2, h3, h4, h5, h6 {
 .testimonial-card:hover {
     transform: translateY(-4px);
     border-color: var(--prestige-gold);
-    box-shadow: 0 12px 28px rgba(91, 26, 48, 0.1);
+    box-shadow: 0 12px 28px rgba(var(--prestige-gold-rgb), 0.12);
 }
 
 .testimonial-stars {
@@ -1480,7 +1480,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .reel-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 16px 32px rgba(91, 26, 48, 0.15);
+    box-shadow: 0 16px 32px rgba(var(--prestige-gold-rgb), 0.2);
     border-color: var(--prestige-gold);
 }
 
