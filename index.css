@@ -1390,88 +1390,129 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 500;
 }
 
-/* Evidence Gallery */
-.evidence-gallery-section {
-    padding: 32px 16px;
+/* Customer Video Reels Section */
+.video-reels-section {
+    padding: 48px 24px;
     border-bottom: var(--border-thin);
 }
 
-.evidence-grid {
+.video-reels-header {
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto 36px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.video-reels-header .section-subtext {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.reels-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
 }
 
-.evidence-item {
-    width: 100%;
+@media (min-width: 640px) {
+    .reels-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
-.evidence-frame {
+@media (min-width: 1024px) {
+    .reels-grid {
+        grid-template-columns: repeat(6, 1fr);
+        gap: 16px;
+    }
+}
+
+.reel-card {
     position: relative;
     width: 100%;
-    aspect-ratio: 1 / 1;
-    background: #faf9f6;
-    border: 1px solid var(--border-color);
+    aspect-ratio: 9 / 16;
+    border-radius: 16px;
     overflow: hidden;
+    background: #18181b;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    transition: transform 0.35 ease, box-shadow 0.35s ease, border-color 0.35s ease;
 }
 
-.evidence-img,
-.evidence-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.4s ease;
-}
-
-.evidence-play-badge {
-    position: absolute;
-    top: 6px;
-    left: 6px;
-    background: rgba(0, 0, 0, 0.65);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: #ffffff;
-    font-size: 8px;
-    font-weight: 600;
-    padding: 3px 6px;
-    border-radius: 4px;
-    letter-spacing: 0.5px;
-    z-index: 3;
-}
-
-.evidence-caption {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 6px 4px;
-    font-size: 8px;
-    text-align: center;
-    color: #e4e4e7;
-    transform: translateY(100%);
-    transition: transform var(--transition-speed) ease, color var(--transition-speed) ease;
-    z-index: 4;
-}
-
-.evidence-frame:hover {
+.reel-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 32px rgba(91, 26, 48, 0.15);
     border-color: var(--prestige-gold);
 }
 
-.evidence-frame:hover .evidence-img,
-.evidence-frame:hover .evidence-video {
-    transform: scale(1.08);
+.reel-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
 }
 
-.evidence-frame:hover .evidence-caption {
-    transform: translateY(0);
+.reel-card:hover .reel-video {
+    transform: scale(1.06);
+}
+
+.reel-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(15, 23, 42, 0.92) 0%, rgba(15, 23, 42, 0.4) 40%, transparent 75%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+    padding: 16px;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.reel-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #ffffff;
+    color: #0f172a;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    letter-spacing: 0.2px;
+    transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+}
+
+.play-icon {
+    font-size: 9px;
+    color: #0f172a;
+}
+
+.reel-card:hover .reel-pill {
+    background: var(--prestige-gold);
     color: #ffffff;
+    transform: scale(1.05);
+}
+
+.reel-card:hover .play-icon {
+    color: #ffffff;
+}
+
+.reel-title {
+    color: #ffffff;
+    font-family: var(--font-heading);
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1.35;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 /* FAQ Accordion */
