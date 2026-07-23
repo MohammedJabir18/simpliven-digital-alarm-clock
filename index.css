@@ -1285,22 +1285,41 @@ h1, h2, h3, h4, h5, h6 {
     text-align: left;
 }
 
-/* Testimonials Grid (LegalFirst LLC Clean Aesthetic) */
-.testimonials-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
+/* Testimonials Marquee (Continuous Infinite Auto-Scroll with Pause on Hover) */
+.testimonials-marquee {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
     margin-top: 24px;
+    padding: 12px 0;
+    mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
 }
 
-@media (min-width: 768px) {
-    .testimonials-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 24px;
+.testimonials-track {
+    display: flex;
+    gap: 20px;
+    width: max-content;
+    animation: testimonialScroll 40s linear infinite;
+    will-change: transform;
+}
+
+.testimonials-marquee:hover .testimonials-track {
+    animation-play-state: paused;
+}
+
+@keyframes testimonialScroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(calc(-50% - 10px));
     }
 }
 
 .testimonial-card {
+    width: 320px;
+    flex-shrink: 0;
     background: #ffffff;
     border: 1px solid var(--border-color);
     border-radius: 12px;
