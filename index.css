@@ -1236,16 +1236,19 @@ h1, h2, h3, h4, h5, h6 {
     border-bottom: var(--border-thin);
     margin-bottom: 24px;
     background: var(--bg-card);
+    width: 100%;
 }
 
 .stat-cell {
-    padding: 16px 8px;
+    padding: 14px 4px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    text-align: center;
     gap: 4px;
     border-right: var(--border-thin);
+    min-width: 0; /* Prevents overflow issues in flex/grid children */
 }
 
 .stat-cell:last-child {
@@ -1253,16 +1256,46 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .stat-value {
-    font-size: 24px;
-    font-weight: 900;
+    font-size: 20px;
+    font-weight: 800;
     line-height: 1;
-    letter-spacing: -1px;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    white-space: nowrap;
 }
 
 .stat-unit {
-    font-size: 12px;
-    font-weight: bold;
+    font-size: 11px;
+    font-weight: 700;
     color: var(--text-muted);
+    margin-left: 1px;
+}
+
+.proof-stats-bar .tech-mono {
+    font-size: 8.5px;
+    letter-spacing: 0.5px;
+    text-align: center;
+    color: var(--text-muted);
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+@media (min-width: 480px) {
+    .stat-cell {
+        padding: 16px 8px;
+    }
+    .stat-value {
+        font-size: 24px;
+    }
+    .stat-unit {
+        font-size: 12px;
+    }
+    .proof-stats-bar .tech-mono {
+        font-size: 9.5px;
+        letter-spacing: 0.8px;
+    }
 }
 
 .proof-loading {
@@ -1461,58 +1494,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .reel-card:hover .reel-video {
     transform: scale(1.06);
-}
-
-.reel-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(15, 23, 42, 0.92) 0%, rgba(15, 23, 42, 0.4) 40%, transparent 75%);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: flex-start;
-    padding: 16px;
-    gap: 8px;
-    pointer-events: none;
-}
-
-.reel-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: #ffffff;
-    color: #0f172a;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 6px 12px;
-    border-radius: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    letter-spacing: 0.2px;
-    transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease;
-}
-
-.play-icon {
-    font-size: 9px;
-    color: #0f172a;
-}
-
-.reel-card:hover .reel-pill {
-    background: var(--prestige-gold);
-    color: #ffffff;
-    transform: scale(1.05);
-}
-
-.reel-card:hover .play-icon {
-    color: #ffffff;
-}
-
-.reel-title {
-    color: #ffffff;
-    font-family: var(--font-heading);
-    font-size: 12.5px;
-    font-weight: 600;
-    line-height: 1.35;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 /* FAQ Accordion */
