@@ -1,118 +1,232 @@
 /**
- * Simpliven™ Shopify Storefront API Permalinks & Pricing Helper
+ * Simpliven™ Shopify Storefront API Client
  * File: shopify.js
+ * Version: 2.0.0
+ *
+ * ⚠️  SECURITY NOTE:
+ * Only the STOREFRONT access token belongs here.
+ * Never put your Admin API secret in this file.
+ * The Storefront token is intentionally public-safe (read-only).
  */
 
-// Storefront Configuration
+// ─── Configuration ───────────────────────────────────────────────────────────
+
 const SHOPIFY_CONFIG = {
-  storeDomain: "a1vwxm-qr.myshopify.com", // Always use Shopify store domain — never derive from current hostname
-  productId: "9823593169131",
-  defaultVariantId: "49072796926187",
-  productHandle: "simpliven™-smart-led-mirror-alarm-clock-large-digital-display-temperature-display-usb-powered-modern-bedside-table-clock-for-bedroom-office-study",
-  discountCode: "SIMPLIVEN60"
+  storeDomain:            'a1vwxm-qr.myshopify.com',
+  storefrontApiVersion:   '2024-01',
+  // ↓ Paste your Storefront API Access Token here (from Shopify Admin → Apps → Your App → API credentials)
+  storefrontAccessToken:  'YOUR_STOREFRONT_ACCESS_TOKEN',
+  productHandle:          'simpliven™-smart-led-mirror-alarm-clock-large-digital-display-temperature-display-usb-powered-modern-bedside-table-clock-for-bedroom-office-study',
+  defaultVariantId:       'gid://shopify/ProductVariant/49072796926187',
+  discountCode:           'PREPAID60',
 };
 
-var SHOPIFY_STORE_DOMAIN = SHOPIFY_CONFIG.storeDomain;
-var DEFAULT_VARIANT_ID = SHOPIFY_CONFIG.defaultVariantId;
+// ─── GraphQL Endpoint ─────────────────────────────────────────────────────────
 
-var PRICING_CONFIG = {
-  prepaid: {
-    price: 799,
-    formattedPrice: "₹799.00",
-    subtotal: 1999,
-    formattedSubtotal: "₹1,999.00",
-    savings: 1200,
-    formattedSavings: "₹1,200.00",
-    tag: "Instant UPI Discount (60% OFF)",
-    discountCode: "PREPAID60"
-  },
-  partial_cod: {
-    price: 799,
-    formattedPrice: "₹799.00",
-    subtotal: 1999,
-    formattedSubtotal: "₹1,999.00",
-    savings: 1200,
-    formattedSavings: "₹1,200.00",
-    tag: "Partial COD (₹199 Deposit + ₹600 COD)",
-    advance: 199,
-    formattedAdvance: "₹199.00",
-    codBalance: 600,
-    formattedCodBalance: "₹600.00",
-    discountCode: "PARTIALCOD"
-  },
-  full_cod: {
-    price: 799,
-    formattedPrice: "₹799.00",
-    subtotal: 1999,
-    formattedSubtotal: "₹1,999.00",
-    savings: 1200,
-    formattedSavings: "₹1,200.00",
-    tag: "Full Cash on Delivery",
-    discountCode: "FULLCOD"
+const STOREFRONT_ENDPOINT = `https://${SHOPIFY_CONFIG.storeDomain}/api/${SHOPIFY_CONFIG.storefrontApiVersion}/graphql.json`;
+
+// ─── Storefront GraphQL Helper ────────────────────────────────────────────────
+
+async function storefrontQuery(query, variables) {
+  try {
+    const response = await fetch(STOREFRONT_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Shopify-Storefront-Access-Token': SHOPIFY_CONFIG.storefrontAccessToken,
+      },
+      body: JSON.stringify({ query, variables }),
+    });
+    if (!response.ok) {
+      throw new Error(`Storefront API HTTP ${response.status}`);
+    }
+    const json = await response.json();
+    if (json.errors && json.errors.length) {
+      console.error('[Simpliven] Storefront API errors:', json.errors);
+    }
+    return json.data;
+  } catch (err) {
+    console.error('[Simpliven] Storefront API request failed:', err);
+    return null;
   }
-};
-
-/**
- * Generate full Shopify checkout permalink URL
- * @param {string} variantId - Shopify Variant ID (defaults to DEFAULT_VARIANT_ID)
- * @param {number} quantity - Quantity of product (defaults to 1)
- * @param {string} paymentMode - Selected payment tier ('prepaid', 'partial_cod', or 'full_cod')
- * @returns {string} Permalink URL
- */
-function generateShopifyCheckoutUrl(variantId, quantity, paymentMode) {
-  var vId = variantId || DEFAULT_VARIANT_ID;
-  var qty = (typeof quantity === 'number' && quantity > 0) ? quantity : 1;
-  var mode = paymentMode || 'prepaid';
-  // Always use the hardcoded Shopify config domain — never window.SHOPIFY_STORE_DOMAIN
-  // which could incorrectly resolve to the Netlify/CDN hostname.
-  var domain = SHOPIFY_CONFIG.storeDomain;
-  
-  return `https://${domain}/cart/${vId}:${qty}?discount=PREPAID60&checkout[payment_mode]=${mode}`;
 }
 
-/**
- * Get pricing details for a selected payment tier
- * @param {string} paymentMode - Selected payment tier ('prepaid', 'partial_cod', or 'full_cod')
- * @returns {object} Pricing details object
- */
-function getPricingDetails(paymentMode) {
-  var mode = paymentMode || 'prepaid';
-  return PRICING_CONFIG[mode] || PRICING_CONFIG.prepaid;
+// ─── Fetch Live Product Data ──────────────────────────────────────────────────
+
+const PRODUCT_QUERY = `
+  query GetProduct($handle: String!) {
+    productByHandle(handle: $handle) {
+      id
+      title
+      availableForSale
+      totalInventory
+      variants(first: 10) {
+        edges {
+          node {
+            id
+            title
+            availableForSale
+            quantityAvailable
+            priceV2 {
+              amount
+              currencyCode
+            }
+            compareAtPriceV2 {
+              amount
+              currencyCode
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+async function fetchProductData() {
+  const data = await storefrontQuery(PRODUCT_QUERY, {
+    handle: SHOPIFY_CONFIG.productHandle,
+  });
+  if (!data || !data.productByHandle) return null;
+
+  const product = data.productByHandle;
+  const variants = product.variants.edges.map(e => e.node);
+
+  return {
+    id:               product.id,
+    title:            product.title,
+    availableForSale: product.availableForSale,
+    totalInventory:   product.totalInventory,
+    variants,
+    // Convenience: first variant price as a number
+    price: variants.length
+      ? Math.round(parseFloat(variants[0].priceV2.amount))
+      : 799,
+    compareAtPrice: variants.length && variants[0].compareAtPriceV2
+      ? Math.round(parseFloat(variants[0].compareAtPriceV2.amount))
+      : 1999,
+  };
 }
 
+// ─── Create Cart & Get Checkout URL ──────────────────────────────────────────
+
+const CART_CREATE_MUTATION = `
+  mutation CartCreate($input: CartInput!) {
+    cartCreate(input: $input) {
+      cart {
+        id
+        checkoutUrl
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
 /**
- * Redirect browser to Shopify checkout permalink for specified payment mode
- * @param {string} paymentMode - Selected payment tier ('prepaid', 'partial_cod', or 'full_cod')
- * @param {string} variantId - Optional Shopify Variant ID
- * @param {number} quantity - Optional quantity
- * @returns {string} The checkout URL constructed
+ * Create a Shopify cart for the given variant/quantity and return the checkout URL.
+ * @param {string} variantGid  - Shopify variant GID  e.g. "gid://shopify/ProductVariant/49072796926187"
+ * @param {number} quantity    - Item quantity
+ * @param {string} discountCode- Discount code to apply (optional)
+ * @returns {Promise<string|null>} Shopify-generated checkout URL
  */
-function redirectShopifyCheckout(paymentMode, variantId, quantity) {
-  var checkoutUrl = generateShopifyCheckoutUrl(variantId, quantity, paymentMode);
-  if (typeof window !== 'undefined' && window.location) {
+async function createCartAndGetCheckoutUrl(variantGid, quantity, discountCode) {
+  const input = {
+    lines: [{ merchandiseId: variantGid, quantity }],
+  };
+  if (discountCode) {
+    input.discountCodes = [discountCode];
+  }
+
+  const data = await storefrontQuery(CART_CREATE_MUTATION, { input });
+  if (!data || !data.cartCreate) return null;
+
+  const { cart, userErrors } = data.cartCreate;
+  if (userErrors && userErrors.length) {
+    console.error('[Simpliven] Cart errors:', userErrors);
+  }
+  return cart ? cart.checkoutUrl : null;
+}
+
+// ─── Checkout Permalink Fallback ──────────────────────────────────────────────
+// Used if the Storefront API token is not yet configured or a request fails.
+
+function buildFallbackCheckoutUrl(variantNumericId, quantity, discount) {
+  const qty = quantity > 0 ? quantity : 1;
+  const disc = discount || SHOPIFY_CONFIG.discountCode;
+  return `https://${SHOPIFY_CONFIG.storeDomain}/cart/${variantNumericId}:${qty}?discount=${disc}`;
+}
+
+// ─── Main Checkout Trigger ────────────────────────────────────────────────────
+
+/**
+ * The single entry-point called by app.js when any "Order Now" button is clicked.
+ *
+ * @param {number} quantity    - Number of units (maps to bundle: 1, 2, or 3)
+ * @param {string} paymentMode - 'prepaid' | 'partial_cod' | 'full_cod'
+ */
+async function triggerShopifyCheckout(quantity, paymentMode) {
+  const qty = quantity > 0 ? quantity : 1;
+
+  // Decide which discount code to apply based on payment mode
+  const discountCode = paymentMode === 'prepaid'
+    ? 'PREPAID60'
+    : paymentMode === 'partial_cod'
+      ? 'PARTIALCOD'
+      : 'FULLCOD';
+
+  // If the Storefront token is not yet configured, fall back to permalink
+  if (SHOPIFY_CONFIG.storefrontAccessToken === 'YOUR_STOREFRONT_ACCESS_TOKEN') {
+    console.warn('[Simpliven] Storefront token not configured — using permalink fallback.');
+    window.location.href = buildFallbackCheckoutUrl(
+      '49072796926187', qty, discountCode
+    );
+    return;
+  }
+
+  // Attempt to create a real Shopify cart
+  const checkoutUrl = await createCartAndGetCheckoutUrl(
+    SHOPIFY_CONFIG.defaultVariantId,
+    qty,
+    discountCode
+  );
+
+  if (checkoutUrl) {
     window.location.href = checkoutUrl;
+  } else {
+    // API failed — graceful fallback to permalink
+    console.warn('[Simpliven] Cart creation failed — using permalink fallback.');
+    window.location.href = buildFallbackCheckoutUrl(
+      '49072796926187', qty, discountCode
+    );
   }
-  return checkoutUrl;
 }
 
-// Global window object exposure for browser scripts
+// ─── Expose Public API ────────────────────────────────────────────────────────
+
 if (typeof window !== 'undefined') {
-  window.SHOPIFY_STORE_DOMAIN = SHOPIFY_STORE_DOMAIN;
-  window.DEFAULT_VARIANT_ID = DEFAULT_VARIANT_ID;
-  window.PRICING_CONFIG = PRICING_CONFIG;
-  window.generateShopifyCheckoutUrl = generateShopifyCheckoutUrl;
-  window.getPricingDetails = getPricingDetails;
-  window.redirectShopifyCheckout = redirectShopifyCheckout;
+  window.ShopifyClient = {
+    config:                      SHOPIFY_CONFIG,
+    fetchProductData,
+    createCartAndGetCheckoutUrl,
+    triggerShopifyCheckout,
+    buildFallbackCheckoutUrl,
+  };
+
+  // Legacy compatibility — app.js calls window.redirectShopifyCheckout
+  window.redirectShopifyCheckout = function(paymentMode, _variantId, quantity) {
+    triggerShopifyCheckout(quantity || 1, paymentMode || 'prepaid');
+  };
 }
 
-// CommonJS module export for testing or Node environment
+// CommonJS (Node/testing)
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
-    SHOPIFY_STORE_DOMAIN: SHOPIFY_STORE_DOMAIN,
-    DEFAULT_VARIANT_ID: DEFAULT_VARIANT_ID,
-    PRICING_CONFIG: PRICING_CONFIG,
-    generateShopifyCheckoutUrl: generateShopifyCheckoutUrl,
-    getPricingDetails: getPricingDetails,
-    redirectShopifyCheckout: redirectShopifyCheckout
+    SHOPIFY_CONFIG,
+    fetchProductData,
+    createCartAndGetCheckoutUrl,
+    triggerShopifyCheckout,
+    buildFallbackCheckoutUrl,
   };
 }

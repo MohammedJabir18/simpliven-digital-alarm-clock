@@ -1,7 +1,9 @@
 /**
  * Simpliven™ Master Interactive Application & Motion Engine — Skincare Aesthetic layout
  * File: app.js
- * Version: 5.0.0
+ * Version: 6.0.0
+ *
+ * Shopify Storefront API connection: live price + inventory fetched via ShopifyClient (shopify.js)
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -14,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initNavScroll();
     initLazyMedia();
     initOptionSync();
+    initShopifyLiveData(); // 🔴 Live Shopify price + stock — runs async in background
 });
 
 // App Global State
@@ -27,6 +30,66 @@ const appState = {
         3: { base: 1999, name: "Home Syndicate Kit" }
     }
 };
+
+// ─── Shopify Live Data Bootstrap ─────────────────────────────────────────────
+// Fetches real-time price and inventory from Shopify Storefront API on page load.
+// Falls back silently to the hardcoded appState values if the API is unavailable.
+async function initShopifyLiveData() {
+    if (!window.ShopifyClient || typeof window.ShopifyClient.fetchProductData !== 'function') {
+        console.warn('[Simpliven] ShopifyClient not available — using hardcoded prices.');
+        return;
+    }
+
+    try {
+        const product = await window.ShopifyClient.fetchProductData();
+        if (!product) return;
+
+        // ── Update base price from Shopify (single unit price = bundle index 1) ──
+        const livePrice = product.price; // e.g. 799
+        if (livePrice && livePrice > 0) {
+            // Scale bundle prices relative to live single-unit price
+            appState.prices[1].base = livePrice;
+            appState.prices[2].base = Math.round(livePrice * 1.875); // ~2x with slight discount
+            appState.prices[3].base = Math.round(livePrice * 2.5);   // ~3x with bigger discount
+            updateStorefrontPrices(); // Re-render all price displays with live data
+        }
+
+        // ── Update stock counter with real Shopify inventory ──
+        const liveStock = product.totalInventory;
+        if (typeof liveStock === 'number' && liveStock > 0) {
+            const stockEl = document.getElementById('stock-counter');
+            if (stockEl) {
+                const displayStock = Math.min(liveStock, 14); // Cap display at 14 for scarcity
+                stockEl.innerText = `${displayStock} UNITS LEFT`;
+            }
+        }
+
+        // ── Show out-of-stock state if unavailable ──
+        if (!product.availableForSale) {
+            const btns = [
+                document.getElementById('hero-checkout-trigger'),
+                document.getElementById('final-checkout-btn'),
+                document.getElementById('sticky-checkout-btn'),
+            ];
+            btns.forEach(btn => {
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerText = 'Out of Stock';
+                    btn.style.opacity = '0.5';
+                }
+            });
+        }
+
+        console.log('[Simpliven] Live Shopify data loaded:', {
+            price: product.price,
+            inventory: product.totalInventory,
+            available: product.availableForSale,
+        });
+    } catch (err) {
+        // Silent fallback — hardcoded prices remain active
+        console.warn('[Simpliven] Could not fetch live Shopify data:', err.message);
+    }
+}
 
 function calculatePrice() {
     const bundle = appState.prices[appState.selectedBundle];
@@ -319,30 +382,33 @@ function initBundleSelector() {
 }
 
 function triggerSecureCheckout() {
-    const finalPrice = calculatePrice();
-    const qty = appState.selectedBundle; // Maps bundle index (1, 2, or 3) to quantity of items (1, 2, or 3)
-    
-    // Animate Checkout Button State
-    const heroBtn = document.getElementById('hero-checkout-trigger');
+    const qty = appState.selectedBundle; // 1, 2, or 3 units
+
+    // ── Animate all CTA buttons to loading state ──
+    const heroBtn  = document.getElementById('hero-checkout-trigger');
     const finalBtn = document.getElementById('final-checkout-btn');
     const stickyBtn = document.getElementById('sticky-checkout-btn');
 
     [heroBtn, finalBtn, stickyBtn].forEach(btn => {
         if (btn) {
-            btn.innerHTML = `Securing Order Link...`;
+            btn.innerHTML = `<span>Securing Your Order...</span>`;
             btn.disabled = true;
         }
     });
 
-    setTimeout(() => {
-        if (typeof window.redirectShopifyCheckout === 'function') {
-            window.redirectShopifyCheckout(appState.paymentMode, undefined, qty);
-        } else {
-            const variantId = '49072796926187';
-            const domain = 'a1vwxm-qr.myshopify.com';
-            window.location.href = `https://${domain}/cart/${variantId}:${qty}?discount=PREPAID60&checkout[payment_mode]=${appState.paymentMode}`;
-        }
-    }, 500);
+    // ── Delegate entirely to ShopifyClient (shopify.js) ──
+    // ShopifyClient.triggerShopifyCheckout handles:
+    //   1. Creating a real Shopify Cart via Storefront API → getting a real checkoutUrl
+    //   2. Graceful permalink fallback if API is unavailable or token not yet configured
+    if (window.ShopifyClient && typeof window.ShopifyClient.triggerShopifyCheckout === 'function') {
+        window.ShopifyClient.triggerShopifyCheckout(qty, appState.paymentMode);
+    } else {
+        // Hard fallback: direct Shopify permalink (never points to simpliven.com)
+        const variantId = '49072796926187';
+        const domain    = 'a1vwxm-qr.myshopify.com';
+        const discount  = appState.paymentMode === 'prepaid' ? 'PREPAID60' : 'FULLCOD';
+        window.location.href = `https://${domain}/cart/${variantId}:${qty}?discount=${discount}`;
+    }
 }
 
 function initStickyDrawer() {
@@ -602,8 +668,10 @@ function initStockCounter() {
     const stockEl = document.getElementById('stock-counter');
     if (!stockEl) return;
 
-    let stockUnits = 14; // Default starting scarcity units
-    
+    // Live inventory is loaded by initShopifyLiveData() and written to stockEl.
+    // This function runs a visual countdown animation from whatever value is already displayed.
+    let stockUnits = parseInt(stockEl.innerText, 10) || 14;
+
     const interval = setInterval(() => {
         if (Math.random() > 0.7) {
             stockUnits -= 1;
