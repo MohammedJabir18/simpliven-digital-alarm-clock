@@ -47,7 +47,7 @@ function updateStorefrontPrices() {
     // Update Hero CTA Button
     const heroCheckoutBtn = document.getElementById('hero-checkout-trigger');
     if (heroCheckoutBtn) {
-        heroCheckoutBtn.innerHTML = `<span>Add to Routine — ${formattedPrice}</span><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
+        heroCheckoutBtn.innerHTML = `<span>Order Now — ${formattedPrice}</span><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
     }
 
     // Update Price display in Hero Details
