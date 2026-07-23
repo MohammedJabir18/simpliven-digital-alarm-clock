@@ -7,10 +7,10 @@
     --bg-card-rgb: 255, 255, 255;
     --text-light: #1c1917; /* Deep Slate Charcoal font contrast */
     --text-muted: #78716c; /* Warm Slate grey */
-    --prestige-gold: #ED254E; /* Crimson Berry primary conversion accent */
-    --prestige-gold-rgb: 237, 37, 78;
-    --gold-hover: #d11d42; /* Darker crimson berry on hover */
-    --gold-glow: rgba(237, 37, 78, 0.12);
+    --prestige-gold: #74121D; /* Deep Rich Wine Burgundy primary conversion accent */
+    --prestige-gold-rgb: 116, 18, 29;
+    --gold-hover: #5a0e17; /* Darker rich burgundy on hover */
+    --gold-glow: rgba(116, 18, 29, 0.12);
     --border-color: rgba(0, 0, 0, 0.06); /* Thin borders */
     --border-thick: 2px solid var(--prestige-gold);
     --border-thin: 1px solid var(--border-color);
@@ -22,7 +22,7 @@
     --border-radius-sm: 8px;
     --btn-text: #ffffff; /* High contrast white text on accent button */
     --badge-after-text: #ffffff;
-    --text-accent: #ED254E; /* Crimson Berry accents */
+    --text-accent: #74121D; /* Rich Burgundy accents */
 }
 
 * {
@@ -273,7 +273,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .headline-brand {
-    background: linear-gradient(135deg, #ED254E 0%, #b81439 100%);
+    background: linear-gradient(135deg, #74121D 0%, #991b2b 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 900;
@@ -287,9 +287,9 @@ h1, h2, h3, h4, h5, h6 {
     text-transform: uppercase;
     padding: 2px 6px;
     border-radius: 20px;
-    background: rgba(237, 37, 78, 0.08);
+    background: rgba(116, 18, 29, 0.08);
     color: var(--prestige-gold);
-    border: 1px solid rgba(237, 37, 78, 0.2);
+    border: 1px solid rgba(116, 18, 29, 0.2);
     vertical-align: middle;
     margin-left: 4px;
 }
@@ -620,7 +620,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .badge-after {
     right: 12px;
-    background: rgba(237, 37, 78, 0.95);
+    background: rgba(116, 18, 29, 0.95);
     color: var(--badge-after-text);
     border-color: var(--prestige-gold);
     box-shadow: 0 4px 12px var(--gold-glow);
