@@ -23,7 +23,32 @@ Thumbs.db
 tmp/
 dist/
 build/
+
+# ─── Credentials & Secrets (NEVER commit these) ───────────────────────────────
+# All .env variants
 .env
 .env.local
 .env.*.local
+.env.production
+.env.development
+
+# Shopify credential files
+shopify.config.local.js
+shopify.private.js
+secrets.js
+secrets.json
+config.local.js
+config.private.js
+
+# Any file with 'secret', 'token', 'key', 'credential' in the name
+*secret*
+*credentials*
+*private-key*
+*access-token*
+
+# Generic secret/key files
+*.pem
+*.key
+*.p12
+*.pfx
 

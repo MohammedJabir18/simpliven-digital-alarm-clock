@@ -772,6 +772,11 @@
     </div>
 
     <!-- Application Script Engines -->
+    <!--
+      shopify.config.local.js: gitignored local file holding your Storefront API token.
+      onerror silently skips if missing (e.g. on GitHub Pages where it's not uploaded).
+    -->
+    <script src="shopify.config.local.js" onerror="void(0)"></script>
     <script src="shopify.js"></script>
     <script src="app.js"></script>
 </body>

@@ -14,12 +14,15 @@
 const SHOPIFY_CONFIG = {
   storeDomain:            'a1vwxm-qr.myshopify.com',
   storefrontApiVersion:   '2024-01',
-  // ↓ Paste your Storefront API Access Token here (from Shopify Admin → Apps → Your App → API credentials)
-  storefrontAccessToken:  'YOUR_STOREFRONT_ACCESS_TOKEN',
+  // Token is loaded from shopify.config.local.js (gitignored) at runtime.
+  // To set it: open shopify.config.local.js and paste your Storefront API token.
+  storefrontAccessToken:  (typeof window !== 'undefined' && window.__SHOPIFY_STOREFRONT_TOKEN__)
+                            || 'YOUR_STOREFRONT_ACCESS_TOKEN',
   productHandle:          'simpliven™-smart-led-mirror-alarm-clock-large-digital-display-temperature-display-usb-powered-modern-bedside-table-clock-for-bedroom-office-study',
   defaultVariantId:       'gid://shopify/ProductVariant/49072796926187',
   discountCode:           'PREPAID60',
 };
+
 
 // ─── GraphQL Endpoint ─────────────────────────────────────────────────────────
 
