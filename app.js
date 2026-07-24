@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initNavScroll();
     initLazyMedia();
     initOptionSync();
+    initAddressModal();
+    initWhatsAppMinimize();
     initShopifyLiveData(); // 🔴 Live Shopify price + stock — runs async in background
 });
 
@@ -382,33 +384,245 @@ function initBundleSelector() {
 }
 
 function triggerSecureCheckout() {
-    const qty = appState.selectedBundle; // 1, 2, or 3 units
+    openAddressModal();
+}
 
-    // ── Animate all CTA buttons to loading state ──
-    const heroBtn  = document.getElementById('hero-checkout-trigger');
-    const finalBtn = document.getElementById('final-checkout-btn');
-    const stickyBtn = document.getElementById('sticky-checkout-btn');
+// ─── Express Shipping Address Modal Engine ────────────────────────────────────
 
-    [heroBtn, finalBtn, stickyBtn].forEach(btn => {
-        if (btn) {
-            btn.innerHTML = `<span>Securing Your Order...</span>`;
-            btn.disabled = true;
+function initAddressModal() {
+    const modal = document.getElementById('address-modal');
+    const closeBtn = document.getElementById('address-modal-close');
+    const form = document.getElementById('shipping-form');
+
+    if (!modal || !form) return;
+
+    // Close modal on backdrop click or close button
+    closeBtn?.addEventListener('click', closeAddressModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeAddressModal();
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.hasAttribute('hidden')) {
+            closeAddressModal();
         }
     });
 
-    // ── Delegate entirely to ShopifyClient (shopify.js) ──
-    // ShopifyClient.triggerShopifyCheckout handles:
-    //   1. Creating a real Shopify Cart via Storefront API → getting a real checkoutUrl
-    //   2. Graceful permalink fallback if API is unavailable or token not yet configured
-    if (window.ShopifyClient && typeof window.ShopifyClient.triggerShopifyCheckout === 'function') {
-        window.ShopifyClient.triggerShopifyCheckout(qty, appState.paymentMode);
-    } else {
-        // Hard fallback: direct Shopify permalink (never points to simpliven.com)
-        const variantId = '49072796926187';
-        const domain    = 'a1vwxm-qr.myshopify.com';
-        const discount  = appState.paymentMode === 'prepaid' ? 'PREPAID60' : 'FULLCOD';
-        window.location.href = `https://${domain}/cart/${variantId}:${qty}?discount=${discount}`;
+    // Load stored address from localStorage
+    loadSavedAddress();
+
+    // Form Submit
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        handleShippingFormSubmit();
+    });
+}
+
+function openAddressModal() {
+    const modal = document.getElementById('address-modal');
+    if (!modal) return;
+
+    // Update order summary inside modal
+    const summaryBundleEl = document.getElementById('modal-summary-bundle');
+    const summaryPaymentEl = document.getElementById('modal-summary-payment');
+
+    const bundleNames = {
+        1: 'Simpliven™ Single Setup (1 Unit)',
+        2: 'Simpliven™ Double Bedside Pack (2 Units)',
+        3: 'Simpliven™ Family Pack (3 Units)'
+    };
+    const paymentNames = {
+        'prepaid': 'Prepaid Online (UPI / Card - ₹160 Extra Discount)',
+        'partial_cod': 'Partial COD (₹199 Advance + ₹630 COD)',
+        'full_cod': 'Full Cash on Delivery (₹959/unit)'
+    };
+
+    if (summaryBundleEl) summaryBundleEl.textContent = bundleNames[appState.selectedBundle] || `${appState.selectedBundle} Units`;
+    if (summaryPaymentEl) summaryPaymentEl.textContent = paymentNames[appState.paymentMode] || appState.paymentMode;
+
+    modal.removeAttribute('hidden');
+    document.body.style.overflow = 'hidden';
+
+    // Focus first input
+    setTimeout(() => {
+        document.getElementById('shipping-name')?.focus();
+    }, 100);
+}
+
+function closeAddressModal() {
+    const modal = document.getElementById('address-modal');
+    if (!modal) return;
+    modal.setAttribute('hidden', '');
+    document.body.style.overflow = '';
+}
+
+function loadSavedAddress() {
+    try {
+        const saved = localStorage.getItem('simpliven_customer_address');
+        if (!saved) return;
+        const data = JSON.parse(saved);
+        if (data.name && document.getElementById('shipping-name')) document.getElementById('shipping-name').value = data.name;
+        if (data.phone && document.getElementById('shipping-phone')) document.getElementById('shipping-phone').value = data.phone;
+        if (data.email && document.getElementById('shipping-email')) document.getElementById('shipping-email').value = data.email;
+        if (data.address1 && document.getElementById('shipping-address1')) document.getElementById('shipping-address1').value = data.address1;
+        if (data.zip && document.getElementById('shipping-zip')) document.getElementById('shipping-zip').value = data.zip;
+        if (data.city && document.getElementById('shipping-city')) document.getElementById('shipping-city').value = data.city;
+        if (data.state && document.getElementById('shipping-state')) document.getElementById('shipping-state').value = data.state;
+    } catch (e) {
+        console.warn('Could not load saved address:', e);
     }
+}
+
+function handleShippingFormSubmit() {
+    const errorBanner = document.getElementById('form-error-msg');
+    const submitBtn = document.getElementById('submit-shipping-btn');
+
+    if (errorBanner) {
+        errorBanner.setAttribute('hidden', '');
+        errorBanner.textContent = '';
+    }
+
+    // Inputs
+    const nameEl = document.getElementById('shipping-name');
+    const phoneEl = document.getElementById('shipping-phone');
+    const emailEl = document.getElementById('shipping-email');
+    const address1El = document.getElementById('shipping-address1');
+    const zipEl = document.getElementById('shipping-zip');
+    const cityEl = document.getElementById('shipping-city');
+    const stateEl = document.getElementById('shipping-state');
+
+    const name = nameEl?.value.trim() || '';
+    const phone = phoneEl?.value.trim() || '';
+    const email = emailEl?.value.trim() || '';
+    const address1 = address1El?.value.trim() || '';
+    const zip = zipEl?.value.trim() || '';
+    const city = cityEl?.value.trim() || '';
+    const state = stateEl?.value.trim() || '';
+
+    // Remove old error highlights
+    [nameEl, phoneEl, address1El, zipEl, cityEl, stateEl].forEach(el => el?.classList.remove('input-error'));
+
+    // Validations
+    if (!name) {
+        showFormError(nameEl, 'Please enter your Full Name.');
+        return;
+    }
+    if (!phone || !/^[6-9]\d{9}$/.test(phone)) {
+        showFormError(phoneEl, 'Please enter a valid 10-digit Indian Mobile Number starting with 6, 7, 8, or 9.');
+        return;
+    }
+    if (!address1) {
+        showFormError(address1El, 'Please enter your Flat / Building / Street Address.');
+        return;
+    }
+    if (!zip || !/^\d{6}$/.test(zip)) {
+        showFormError(zipEl, 'Please enter a valid 6-digit Pincode.');
+        return;
+    }
+    if (!city) {
+        showFormError(cityEl, 'Please enter your City.');
+        return;
+    }
+    if (!state) {
+        showFormError(stateEl, 'Please enter your State.');
+        return;
+    }
+
+    // Split Name into First Name & Last Name
+    const nameParts = name.split(' ');
+    const firstName = nameParts[0] || name;
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    // Construct address object
+    const addressData = {
+        fullName: name,
+        firstName,
+        lastName,
+        phone,
+        email,
+        address1,
+        zip,
+        city,
+        province: state
+    };
+
+    // Save to localStorage
+    try {
+        localStorage.setItem('simpliven_customer_address', JSON.stringify({
+            name, phone, email, address1, zip, city, state
+        }));
+    } catch (e) {
+        console.warn('Could not save address to localStorage:', e);
+    }
+
+    // Loading State
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'PREPARING SHOPIFY CHECKOUT...';
+    }
+
+    // Trigger Shopify Checkout with addressData
+    const qty = appState.selectedBundle;
+    if (window.ShopifyClient && typeof window.ShopifyClient.triggerShopifyCheckout === 'function') {
+        window.ShopifyClient.triggerShopifyCheckout(qty, appState.paymentMode, addressData);
+    } else {
+        const variantId = '49072796926187';
+        const domain = 'a1vwxm-qr.myshopify.com';
+        const discount = appState.paymentMode === 'prepaid' ? 'PREPAID60' : (appState.paymentMode === 'partial_cod' ? 'PARTIALCOD' : 'FULLCOD');
+        const note = encodeURIComponent(`Bundle: ${qty} Units | Payment Mode: ${appState.paymentMode}`);
+        let url = `https://${domain}/cart/${variantId}:${qty}?discount=${discount}&note=${note}`;
+        url += `&checkout[shipping_address][first_name]=${encodeURIComponent(firstName)}`;
+        url += `&checkout[shipping_address][last_name]=${encodeURIComponent(lastName)}`;
+        url += `&checkout[shipping_address][phone]=${encodeURIComponent(phone)}`;
+        url += `&checkout[shipping_address][address1]=${encodeURIComponent(address1)}`;
+        url += `&checkout[shipping_address][city]=${encodeURIComponent(city)}`;
+        url += `&checkout[shipping_address][province]=${encodeURIComponent(state)}`;
+        url += `&checkout[shipping_address][zip]=${encodeURIComponent(zip)}`;
+        url += `&checkout[shipping_address][country]=India`;
+        if (email) url += `&checkout[email]=${encodeURIComponent(email)}`;
+        window.location.href = url;
+    }
+}
+
+function showFormError(inputEl, message) {
+    const errorBanner = document.getElementById('form-error-msg');
+    if (inputEl) {
+        inputEl.classList.add('input-error');
+        inputEl.focus();
+    }
+    if (errorBanner) {
+        errorBanner.removeAttribute('hidden');
+        errorBanner.textContent = message;
+    }
+}
+
+function initWhatsAppMinimize() {
+    const widget = document.querySelector('.whatsapp-float-widget');
+    if (!widget) return;
+
+    // Start with full text visible on mobile load, then collapse to icon after 3 seconds
+    let timer = setTimeout(() => {
+        if (window.innerWidth <= 600) {
+            widget.classList.add('minimized');
+        }
+    }, 3000);
+
+    // Minimize on scroll
+    window.addEventListener('scroll', () => {
+        if (window.innerWidth <= 600 && window.scrollY > 80) {
+            widget.classList.add('minimized');
+        }
+    }, { passive: true });
+
+    // Expand on tap or hover
+    const expandWidget = () => {
+        widget.classList.remove('minimized');
+        clearTimeout(timer);
+    };
+
+    widget.addEventListener('mouseenter', expandWidget);
+    widget.addEventListener('touchstart', expandWidget, { passive: true });
 }
 
 function initStickyDrawer() {

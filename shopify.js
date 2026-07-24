@@ -132,14 +132,43 @@ const CART_CREATE_MUTATION = `
  * @param {string} variantGid  - Shopify variant GID  e.g. "gid://shopify/ProductVariant/49072796926187"
  * @param {number} quantity    - Item quantity
  * @param {string} discountCode- Discount code to apply (optional)
+ * @param {Array}  attributes  - Custom cart attributes array [{key, value}]
+ * @param {string} note        - Custom order note
+ * @param {Object} addressData - Customer shipping address object
  * @returns {Promise<string|null>} Shopify-generated checkout URL
  */
-async function createCartAndGetCheckoutUrl(variantGid, quantity, discountCode) {
+async function createCartAndGetCheckoutUrl(variantGid, quantity, discountCode, attributes = [], note = '', addressData = null) {
   const input = {
     lines: [{ merchandiseId: variantGid, quantity }],
   };
   if (discountCode) {
     input.discountCodes = [discountCode];
+  }
+  if (attributes && attributes.length) {
+    input.attributes = attributes;
+  }
+  if (note) {
+    input.note = note;
+  }
+  if (addressData) {
+    const { firstName, lastName, address1, city, province, zip, phone, email } = addressData;
+    const formattedPhone = phone ? (phone.startsWith('+') ? phone : `+91${phone}`) : undefined;
+    input.buyerIdentity = {
+      email: email || undefined,
+      phone: formattedPhone,
+      deliveryAddressPreferences: [{
+        deliveryAddress: {
+          firstName: firstName || '',
+          lastName: lastName || '',
+          address1: address1 || '',
+          city: city || '',
+          province: province || '',
+          zip: zip || '',
+          country: 'IN',
+          phone: formattedPhone
+        }
+      }]
+    };
   }
 
   const data = await storefrontQuery(CART_CREATE_MUTATION, { input });
@@ -155,10 +184,25 @@ async function createCartAndGetCheckoutUrl(variantGid, quantity, discountCode) {
 // ─── Checkout Permalink Fallback ──────────────────────────────────────────────
 // Used if the Storefront API token is not yet configured or a request fails.
 
-function buildFallbackCheckoutUrl(variantNumericId, quantity, discount) {
+function buildFallbackCheckoutUrl(variantNumericId, quantity, discount, note = '', addressData = null) {
   const qty = quantity > 0 ? quantity : 1;
   const disc = discount || SHOPIFY_CONFIG.discountCode;
-  return `https://${SHOPIFY_CONFIG.storeDomain}/cart/${variantNumericId}:${qty}?discount=${disc}`;
+  let url = `https://${SHOPIFY_CONFIG.storeDomain}/cart/${variantNumericId}:${qty}?discount=${encodeURIComponent(disc)}`;
+  if (note) {
+    url += `&note=${encodeURIComponent(note)}`;
+  }
+  if (addressData) {
+    if (addressData.firstName) url += `&checkout[shipping_address][first_name]=${encodeURIComponent(addressData.firstName)}`;
+    if (addressData.lastName)  url += `&checkout[shipping_address][last_name]=${encodeURIComponent(addressData.lastName)}`;
+    if (addressData.phone)     url += `&checkout[shipping_address][phone]=${encodeURIComponent(addressData.phone)}`;
+    if (addressData.address1)  url += `&checkout[shipping_address][address1]=${encodeURIComponent(addressData.address1)}`;
+    if (addressData.city)      url += `&checkout[shipping_address][city]=${encodeURIComponent(addressData.city)}`;
+    if (addressData.province)  url += `&checkout[shipping_address][province]=${encodeURIComponent(addressData.province)}`;
+    if (addressData.zip)       url += `&checkout[shipping_address][zip]=${encodeURIComponent(addressData.zip)}`;
+    url += `&checkout[shipping_address][country]=India`;
+    if (addressData.email)     url += `&checkout[email]=${encodeURIComponent(addressData.email)}`;
+  }
+  return url;
 }
 
 // ─── Main Checkout Trigger ────────────────────────────────────────────────────
@@ -168,31 +212,62 @@ function buildFallbackCheckoutUrl(variantNumericId, quantity, discount) {
  *
  * @param {number} quantity    - Number of units (maps to bundle: 1, 2, or 3)
  * @param {string} paymentMode - 'prepaid' | 'partial_cod' | 'full_cod'
+ * @param {Object} addressData - Customer shipping address details
  */
-async function triggerShopifyCheckout(quantity, paymentMode) {
+async function triggerShopifyCheckout(quantity, paymentMode, addressData = null) {
   const qty = quantity > 0 ? quantity : 1;
 
-  // Decide which discount code to apply based on payment mode
-  const discountCode = paymentMode === 'prepaid'
-    ? 'PREPAID60'
-    : paymentMode === 'partial_cod'
-      ? 'PARTIALCOD'
-      : 'FULLCOD';
+  // Map bundle labels
+  const bundleLabels = {
+    1: 'Single Pack (1 Unit)',
+    2: 'Double Pack (2 Units - Most Popular)',
+    3: 'Family Pack (3 Units - Best Value)',
+  };
+  const bundleName = bundleLabels[qty] || `${qty} Units`;
+
+  // Map payment mode details
+  let discountCode = 'PREPAID60';
+  let paymentLabel = 'Prepaid (UPI / Cards)';
+
+  if (paymentMode === 'partial_cod') {
+    discountCode = 'PARTIALCOD';
+    paymentLabel = 'Partial COD (₹199 Advance + ₹630 COD)';
+  } else if (paymentMode === 'full_cod') {
+    discountCode = 'FULLCOD';
+    paymentLabel = 'Full Cash on Delivery (₹959/unit)';
+  }
+
+  const attributes = [
+    { key: 'Payment Mode', value: paymentLabel },
+    { key: 'Selected Bundle', value: bundleName },
+    { key: 'Order Source', value: 'Landing Page (simpliven.com)' }
+  ];
+
+  if (addressData) {
+    if (addressData.fullName) attributes.push({ key: 'Customer Name', value: addressData.fullName });
+    if (addressData.phone)    attributes.push({ key: 'Customer Phone', value: addressData.phone });
+  }
+
+  const note = `Bundle: ${bundleName} | Payment Mode: ${paymentLabel}` +
+    (addressData && addressData.fullName ? ` | Name: ${addressData.fullName} (${addressData.phone || ''})` : '');
 
   // If the Storefront token is not yet configured, fall back to permalink
   if (SHOPIFY_CONFIG.storefrontAccessToken === 'YOUR_STOREFRONT_ACCESS_TOKEN') {
     console.warn('[Simpliven] Storefront token not configured — using permalink fallback.');
     window.location.href = buildFallbackCheckoutUrl(
-      '49072796926187', qty, discountCode
+      '49072796926187', qty, discountCode, note, addressData
     );
     return;
   }
 
-  // Attempt to create a real Shopify cart
+  // Attempt to create a real Shopify cart with full attributes, discount & buyer identity
   const checkoutUrl = await createCartAndGetCheckoutUrl(
     SHOPIFY_CONFIG.defaultVariantId,
     qty,
-    discountCode
+    discountCode,
+    attributes,
+    note,
+    addressData
   );
 
   if (checkoutUrl) {
@@ -201,7 +276,7 @@ async function triggerShopifyCheckout(quantity, paymentMode) {
     // API failed — graceful fallback to permalink
     console.warn('[Simpliven] Cart creation failed — using permalink fallback.');
     window.location.href = buildFallbackCheckoutUrl(
-      '49072796926187', qty, discountCode
+      '49072796926187', qty, discountCode, note, addressData
     );
   }
 }
