@@ -866,7 +866,7 @@
                 <div class="modal-header">
                     <span class="modal-badge">⚡ EXPRESS CHECKOUT</span>
                     <h2 id="modal-title" class="modal-heading">Enter Shipping Address</h2>
-                    <p class="modal-subheading">Your details will be pre-filled on the secure Shopify payment gateway.</p>
+                    <p class="modal-subheading">Enter your shipping details below for instant UPI / card checkout.</p>
                 </div>
 
                 <div class="modal-order-summary">
@@ -920,7 +920,45 @@
                         </div>
                         <div class="form-group">
                             <label for="shipping-state">State <span class="req">*</span></label>
-                            <input type="text" id="shipping-state" class="input-brutalist" placeholder="e.g. Maharashtra" required />
+                            <select id="shipping-state" class="input-brutalist select-brutalist" required>
+                                <option value="" disabled selected>Select State</option>
+                                <option value="Kerala">Kerala</option>
+                                <option value="Tamil Nadu">Tamil Nadu</option>
+                                <option value="Karnataka">Karnataka</option>
+                                <option value="Maharashtra">Maharashtra</option>
+                                <option value="Delhi">Delhi</option>
+                                <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                <option value="Telangana">Telangana</option>
+                                <option value="Gujarat">Gujarat</option>
+                                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                <option value="West Bengal">West Bengal</option>
+                                <option value="Rajasthan">Rajasthan</option>
+                                <option value="Punjab">Punjab</option>
+                                <option value="Haryana">Haryana</option>
+                                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                <option value="Bihar">Bihar</option>
+                                <option value="Odisha">Odisha</option>
+                                <option value="Assam">Assam</option>
+                                <option value="Jharkhand">Jharkhand</option>
+                                <option value="Chhattisgarh">Chhattisgarh</option>
+                                <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                <option value="Uttarakhand">Uttarakhand</option>
+                                <option value="Goa">Goa</option>
+                                <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                                <option value="Chandigarh">Chandigarh</option>
+                                <option value="Puducherry">Puducherry</option>
+                                <option value="Tripura">Tripura</option>
+                                <option value="Meghalaya">Meghalaya</option>
+                                <option value="Manipur">Manipur</option>
+                                <option value="Nagaland">Nagaland</option>
+                                <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                <option value="Mizoram">Mizoram</option>
+                                <option value="Sikkim">Sikkim</option>
+                                <option value="Andaman and Nicobar Islands">Andaman & Nicobar</option>
+                                <option value="Dadra and Nagar Haveli and Daman and Diu">Daman & Diu</option>
+                                <option value="Ladakh">Ladakh</option>
+                                <option value="Lakshadweep">Lakshadweep</option>
+                            </select>
                         </div>
                     </div>
 
@@ -939,11 +977,138 @@
             </div>
         </div>
 
+        <!-- Awwwards-Tier Order Success Confirmation Modal -->
+        <div id="order-success-modal" class="awwwards-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="success-modal-title" hidden>
+            <div class="awwwards-modal-card success-card-theme">
+                <button id="success-modal-close" class="awwwards-close-btn" aria-label="Close modal">✕</button>
+
+                <div class="awwwards-icon-wrapper success-glow">
+                    <div class="awwwards-checkmark-ring">
+                        <svg viewBox="0 0 52 52" class="awwwards-svg-icon">
+                            <circle cx="26" cy="26" r="24" fill="none" class="circle-anim green-circle"/>
+                            <path fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" class="path-anim green-check"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="awwwards-header">
+                    <span class="awwwards-badge success-pill">
+                        <span class="pulse-dot green-dot"></span>
+                        PAYMENT VERIFIED • ORDER CONFIRMED
+                    </span>
+                    <h2 id="success-modal-title" class="awwwards-title">Thank You For Your Order!</h2>
+                    <p class="awwwards-subtitle">Your transaction has been secured & synced directly to Shopify. We are preparing your item for express priority dispatch.</p>
+                </div>
+
+                <div class="awwwards-details-grid">
+                    <div class="grid-card">
+                        <div class="grid-row">
+                            <span class="grid-label">Shopify Order ID</span>
+                            <strong id="success-order-number" class="grid-val highlight-burgundy">#1001</strong>
+                        </div>
+                        <div class="grid-row">
+                            <span class="grid-label">Razorpay Reference</span>
+                            <code id="success-payment-id" class="grid-code">pay_...</code>
+                        </div>
+                        <div class="grid-row">
+                            <span class="grid-label">Product Selected</span>
+                            <span id="success-item-name" class="grid-text">Simpliven™ Smart LED Mirror Alarm Clock</span>
+                        </div>
+                        <div class="grid-row">
+                            <span class="grid-label">Delivery Status</span>
+                            <span class="status-badge-green">🚚 3 - 5 Business Days (Express Air)</span>
+                        </div>
+                    </div>
+
+                    <div class="shipping-preview-box">
+                        <div class="shipping-box-header">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                            <span>SHIPPING DESTINATION</span>
+                        </div>
+                        <p id="success-shipping-address" class="shipping-address-content">
+                            Rahul Sharma<br>
+                            Flat 302, Sunrise Apartments, M.G. Road<br>
+                            Mumbai, Maharashtra - 400001 | 📞 +91 9876543210
+                        </p>
+                    </div>
+                </div>
+
+                <div class="awwwards-actions">
+                    <a id="success-whatsapp-btn" href="https://wa.me/919061613233" target="_blank" rel="noopener" class="btn-awwwards-primary btn-whatsapp-gradient">
+                        <svg class="wa-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.705 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l.199.317-1.157 4.227 4.327-1.066.374.229z"/></svg>
+                        <span>GET TRACKING UPDATES ON WHATSAPP</span>
+                    </a>
+
+                    <button id="success-close-btn" class="btn-awwwards-secondary">
+                        RETURN TO STORE
+                    </button>
+                </div>
+
+                <div class="awwwards-footer-note">
+                    🔒 Encrypted via 256-Bit SSL • Tax Invoice & Courier Tracking sent via SMS/Email.
+                </div>
+            </div>
+        </div>
+
+        <!-- Awwwards-Tier Payment Failure Notification Modal -->
+        <div id="order-failure-modal" class="awwwards-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="failure-modal-title" hidden>
+            <div class="awwwards-modal-card failure-card-theme">
+                <button id="failure-modal-close" class="awwwards-close-btn" aria-label="Close modal">✕</button>
+
+                <div class="awwwards-icon-wrapper failure-glow">
+                    <div class="awwwards-failure-ring">
+                        <svg viewBox="0 0 52 52" class="awwwards-svg-icon">
+                            <circle cx="26" cy="26" r="24" fill="none" class="circle-anim red-circle"/>
+                            <path fill="none" d="M16 16l20 20M36 16L16 36" class="path-anim red-cross"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="awwwards-header">
+                    <span class="awwwards-badge failure-pill">
+                        <span class="pulse-dot red-dot"></span>
+                        PAYMENT UNSUCCESSFUL
+                    </span>
+                    <h2 id="failure-modal-title" class="awwwards-title">Transaction Could Not Be Completed</h2>
+                    <p id="failure-modal-reason" class="awwwards-subtitle failure-reason-text">
+                        Your bank or gateway declined the transaction. No money was deducted from your account.
+                    </p>
+                </div>
+
+                <div class="failure-tips-box">
+                    <div class="tips-header">
+                        <span>💡 QUICK WAYS TO COMPLETE YOUR ORDER:</span>
+                    </div>
+                    <ul class="tips-list">
+                        <li><strong>Instant UPI (GPay / PhonePe / Paytm / CRED):</strong> Fastest & 100% success rate on mobile.</li>
+                        <li><strong>Indian Debit/Credit Cards & RuPay:</strong> Ensure domestic online transactions are enabled.</li>
+                        <li><strong>Netbanking (SBI / HDFC / ICICI / Axis):</strong> Available for instant direct bank payment.</li>
+                    </ul>
+                </div>
+
+                <div class="awwwards-actions">
+                    <button id="failure-retry-btn" class="btn-awwwards-primary btn-retry-gradient">
+                        <span>RETRY PAYMENT WITH UPI / CARDS ➔</span>
+                    </button>
+
+                    <button id="failure-cod-help-btn" class="btn-awwwards-secondary">
+                        NEED HELP? CONTACT WHATSAPP SUPPORT
+                    </button>
+                </div>
+
+                <div class="awwwards-footer-note">
+                    🛡️ Need help placing your order? Message our team instantly on WhatsApp.
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Application Script Engines -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="shopify.config.local.js"></script>
     <script src="shopify.js"></script>
+    <script src="razorpay.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

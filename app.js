@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initLazyMedia();
     initOptionSync();
     initAddressModal();
+    initSuccessModalClose();
+    initFailureModalListeners();
     initWhatsAppMinimize();
     initShopifyLiveData(); // 🔴 Live Shopify price + stock — runs async in background
 });
@@ -412,6 +414,23 @@ function initAddressModal() {
     // Load stored address from localStorage
     loadSavedAddress();
 
+    // Pincode to State Auto-Detector
+    const zipInput = document.getElementById('shipping-zip');
+    if (zipInput) {
+        zipInput.addEventListener('input', (e) => {
+            const val = e.target.value.trim();
+            if (/^\d{6}$/.test(val)) {
+                const detectedState = autoDetectStateFromZip(val);
+                if (detectedState) {
+                    const stateSelect = document.getElementById('shipping-state');
+                    if (stateSelect) {
+                        stateSelect.value = detectedState;
+                    }
+                }
+            }
+        });
+    }
+
     // Form Submit
     form.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -419,9 +438,60 @@ function initAddressModal() {
     });
 }
 
+function autoDetectStateFromZip(zipCode) {
+    if (!zipCode || !/^\d{6}$/.test(zipCode)) return null;
+    const prefix2 = parseInt(zipCode.slice(0, 2), 10);
+    const prefix3 = parseInt(zipCode.slice(0, 3), 10);
+
+    if (prefix3 >= 670 && prefix3 <= 695) return 'Kerala';
+    if (prefix3 >= 600 && prefix3 <= 643) return 'Tamil Nadu';
+    if (prefix3 >= 560 && prefix3 <= 591) return 'Karnataka';
+    if (prefix3 >= 400 && prefix3 <= 445) return 'Maharashtra';
+    if (prefix3 >= 110 && prefix3 <= 110) return 'Delhi';
+    if (prefix3 >= 380 && prefix3 <= 396) return 'Gujarat';
+    if (prefix3 >= 700 && prefix3 <= 743) return 'West Bengal';
+    if (prefix3 >= 500 && prefix3 <= 509) return 'Telangana';
+    if (prefix3 >= 515 && prefix3 <= 535) return 'Andhra Pradesh';
+
+    if (prefix2 === 11) return 'Delhi';
+    if (prefix2 >= 12 && prefix2 <= 13) return 'Haryana';
+    if (prefix2 >= 14 && prefix2 <= 15) return 'Punjab';
+    if (prefix2 === 16) return 'Chandigarh';
+    if (prefix2 === 17) return 'Himachal Pradesh';
+    if (prefix2 >= 18 && prefix2 <= 19) return 'Jammu and Kashmir';
+    if (prefix2 >= 20 && prefix2 <= 28) return 'Uttar Pradesh';
+    if (prefix2 >= 30 && prefix2 <= 34) return 'Rajasthan';
+    if (prefix2 >= 36 && prefix2 <= 39) return 'Gujarat';
+    if (prefix2 >= 40 && prefix2 <= 44) return 'Maharashtra';
+    if (prefix2 >= 45 && prefix2 <= 49) return 'Madhya Pradesh';
+    if (prefix2 >= 50 && prefix2 <= 53) return 'Andhra Pradesh';
+    if (prefix2 >= 56 && prefix2 <= 59) return 'Karnataka';
+    if (prefix2 >= 60 && prefix2 <= 64) return 'Tamil Nadu';
+    if (prefix2 >= 67 && prefix2 <= 69) return 'Kerala';
+    if (prefix2 >= 70 && prefix2 <= 74) return 'West Bengal';
+    if (prefix2 >= 75 && prefix2 <= 77) return 'Odisha';
+    if (prefix2 >= 78 && prefix2 <= 79) return 'Assam';
+    if (prefix2 >= 80 && prefix2 <= 85) return 'Bihar';
+
+    return null;
+}
+
+function resetAddressFormSubmitButton() {
+    const submitBtn = document.getElementById('submit-shipping-btn');
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'PROCEED TO SECURE PAYMENT ➔';
+        submitBtn.style.background = '';
+    }
+    window.isPaymentCompletedSuccessfully = false;
+}
+
 function openAddressModal() {
     const modal = document.getElementById('address-modal');
     if (!modal) return;
+
+    // Reset submit button & payment flag for fresh ordering
+    resetAddressFormSubmitButton();
 
     // Update order summary inside modal
     const summaryBundleEl = document.getElementById('modal-summary-bundle');
@@ -544,6 +614,7 @@ function handleShippingFormSubmit() {
         address1,
         zip,
         city,
+        state: state,
         province: state
     };
 
@@ -559,11 +630,51 @@ function handleShippingFormSubmit() {
     // Loading State
     if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.textContent = 'PREPARING SHOPIFY CHECKOUT...';
+        submitBtn.textContent = 'OPENING SECURE PAYMENT...';
     }
 
-    // Trigger Shopify Checkout with addressData
     const qty = appState.selectedBundle;
+    const priceInRupees = calculatePrice();
+    const bundleObj = appState.prices[qty];
+    const bundleName = bundleObj ? bundleObj.name : `${qty} Units`;
+
+    // Reset completion flag for new checkout session
+    window.isPaymentCompletedSuccessfully = false;
+
+    // Trigger Razorpay Web Checkout if available
+    if (window.SimplivenRazorpay && typeof window.SimplivenRazorpay.startRazorpayCheckout === 'function') {
+        window.SimplivenRazorpay.startRazorpayCheckout({
+            amountInRupees: priceInRupees,
+            quantity: qty,
+            customerData: addressData,
+            bundleName: bundleName,
+            paymentMode: appState.paymentMode,
+            onSuccess: (verifyResult, response) => {
+                if (submitBtn) {
+                    submitBtn.textContent = 'PAYMENT VERIFIED! ✅';
+                    submitBtn.style.background = '#10B981';
+                }
+                showOrderSuccessModal(verifyResult, response, addressData, bundleName);
+            },
+            onError: (errMsg) => {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'PROCEED TO SECURE PAYMENT ➔';
+                }
+                showOrderFailureModal(errMsg || 'Payment signature verification failed.', addressData);
+            },
+            onDismiss: () => {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'PROCEED TO SECURE PAYMENT ➔';
+                }
+                showOrderFailureModal('Checkout was cancelled or closed by user. No money was deducted.', addressData);
+            }
+        });
+        return;
+    }
+
+    // Trigger Shopify Checkout with addressData fallback
     if (window.ShopifyClient && typeof window.ShopifyClient.triggerShopifyCheckout === 'function') {
         window.ShopifyClient.triggerShopifyCheckout(qty, appState.paymentMode, addressData);
     } else {
@@ -594,6 +705,136 @@ function showFormError(inputEl, message) {
     if (errorBanner) {
         errorBanner.removeAttribute('hidden');
         errorBanner.textContent = message;
+    }
+}
+
+// State tracking to prevent modal stacking & race conditions
+window.isPaymentCompletedSuccessfully = false;
+
+function showOrderSuccessModal(verifyResult, razorpayResponse, customerData, bundleName) {
+    // Mark global success flag
+    window.isPaymentCompletedSuccessfully = true;
+
+    // Force-hide all other modals to prevent stacking!
+    const addressModal = document.getElementById('address-modal');
+    if (addressModal) addressModal.hidden = true;
+
+    const failureModal = document.getElementById('order-failure-modal');
+    if (failureModal) failureModal.hidden = true;
+
+    const successModal = document.getElementById('order-success-modal');
+    if (!successModal) return;
+
+    // Populate Order Reference Number
+    const orderNumEl = document.getElementById('success-order-number');
+    if (orderNumEl) {
+        const num = verifyResult.shopify_order && verifyResult.shopify_order.orderNumber 
+            ? `#${verifyResult.shopify_order.orderNumber}` 
+            : `#${Math.floor(1000 + Math.random() * 9000)}`;
+        orderNumEl.textContent = num;
+    }
+
+    // Populate Payment ID
+    const payIdEl = document.getElementById('success-payment-id');
+    if (payIdEl) {
+        payIdEl.textContent = razorpayResponse.razorpay_payment_id || 'pay_verified';
+    }
+
+    // Populate Item Name
+    const itemEl = document.getElementById('success-item-name');
+    if (itemEl) {
+        itemEl.textContent = `Simpliven™ Smart Digital LED Mirror Alarm Clock (${bundleName || 'Standard'})`;
+    }
+
+    // Populate Shipping Address
+    const addressEl = document.getElementById('success-shipping-address');
+    if (addressEl && customerData) {
+        const { fullName = 'Customer', address1 = '', city = '', state = '', zip = '', phone = '' } = customerData;
+        addressEl.innerHTML = `
+            <strong>${fullName}</strong><br>
+            ${address1}<br>
+            ${city}, ${state} - ${zip} | 📞 +91 ${phone}
+        `;
+    }
+
+    // Populate WhatsApp Link with order tracking details
+    const waBtn = document.getElementById('success-whatsapp-btn');
+    if (waBtn && customerData) {
+        const num = orderNumEl ? orderNumEl.textContent : '';
+        const msg = encodeURIComponent(`Hi Simpliven! I just completed my prepaid payment for Order ${num} (Payment ID: ${razorpayResponse.razorpay_payment_id}). Please send express tracking updates.`);
+        waBtn.href = `https://wa.me/919061613233?text=${msg}`;
+    }
+
+    // Show Success Modal
+    successModal.hidden = false;
+}
+
+function initSuccessModalClose() {
+    const successModal = document.getElementById('order-success-modal');
+    const closeBtn = document.getElementById('success-modal-close');
+    const returnBtn = document.getElementById('success-close-btn');
+
+    const closeModal = () => {
+        if (successModal) successModal.hidden = true;
+        resetAddressFormSubmitButton();
+    };
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (returnBtn) returnBtn.addEventListener('click', closeModal);
+}
+
+function showOrderFailureModal(reason, customerData) {
+    // GUARD: If payment was already completed successfully, NEVER show failure modal!
+    if (window.isPaymentCompletedSuccessfully) {
+        console.log('[ModalGuard] Payment was already completed successfully. Suppressing failure modal.');
+        return;
+    }
+
+    // Force-hide all other modals to prevent stacking!
+    const addressModal = document.getElementById('address-modal');
+    if (addressModal) addressModal.hidden = true;
+
+    const successModal = document.getElementById('order-success-modal');
+    if (successModal) successModal.hidden = true;
+
+    const failureModal = document.getElementById('order-failure-modal');
+    if (!failureModal) return;
+
+    const reasonEl = document.getElementById('failure-modal-reason');
+    if (reasonEl) {
+        reasonEl.textContent = reason || 'Your bank or payment gateway declined the transaction. No money was deducted from your account.';
+    }
+
+    failureModal.hidden = false;
+}
+
+function initFailureModalListeners() {
+    const failureModal = document.getElementById('order-failure-modal');
+    const closeBtn = document.getElementById('failure-modal-close');
+    const retryBtn = document.getElementById('failure-retry-btn');
+    const helpBtn = document.getElementById('failure-cod-help-btn');
+
+    const closeModal = () => {
+        if (failureModal) failureModal.hidden = true;
+    };
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+    if (retryBtn) {
+        retryBtn.addEventListener('click', () => {
+            closeModal();
+            resetAddressFormSubmitButton();
+            const addressModal = document.getElementById('address-modal');
+            if (addressModal) {
+                addressModal.hidden = false;
+            }
+        });
+    }
+
+    if (helpBtn) {
+        helpBtn.addEventListener('click', () => {
+            window.open('https://wa.me/919061613233?text=Hi%20Simpliven!%20My%20payment%20failed.%20Can%20you%20help%20me%20complete%20my%20order?', '_blank');
+        });
     }
 }
 
