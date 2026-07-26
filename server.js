@@ -22,9 +22,11 @@ const razorpay = new Razorpay({
 });
 
 // Auto-retrieve or refresh Shopify Access Token using Client ID & Secret
-async function getShopifyAccessToken() {
-  if (process.env.SHOPIFY_ADMIN_ACCESS_TOKEN && process.env.SHOPIFY_ADMIN_ACCESS_TOKEN.startsWith('shpat_')) {
-    return process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
+let cachedShopifyToken = null;
+
+async function getShopifyAccessToken(forceRefresh = false) {
+  if (!forceRefresh && cachedShopifyToken) {
+    return cachedShopifyToken;
   }
 
   const shopifyDomain = process.env.SHOPIFY_STORE_DOMAIN || 'a1vwxm-qr.myshopify.com';
@@ -39,13 +41,12 @@ async function getShopifyAccessToken() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           client_id: clientId,
-          client_secret: clientSecret,
-          grant_type: 'client_credentials'
+          client_secret: clientSecret
         })
       });
       const data = await response.json();
       if (response.ok && data.access_token) {
-        process.env.SHOPIFY_ADMIN_ACCESS_TOKEN = data.access_token;
+        cachedShopifyToken = data.access_token;
         return data.access_token;
       }
     } catch (e) {
@@ -232,13 +233,17 @@ async function createShopifyAdminOrder({ customerData = {}, orderInfo = {}, razo
     ];
   }
 
+  const qty = Math.max(1, parseInt(orderInfo.quantity || 1, 10));
+  const totalOrderAmount = orderInfo.amountInRupees || 799;
+  const unitPrice = parseFloat((totalOrderAmount / qty).toFixed(2));
+
   const payload = {
     order: {
       line_items: [
         {
           variant_id: parseInt(orderInfo.variantId || '49072796926187', 10),
-          quantity: parseInt(orderInfo.quantity || 1, 10),
-          price: orderInfo.amountInRupees || 799,
+          quantity: qty,
+          price: unitPrice,
           title: `Simpliven™ Smart Digital LED Mirror Alarm Clock (${orderInfo.bundleName || 'Standard'})`
         }
       ],

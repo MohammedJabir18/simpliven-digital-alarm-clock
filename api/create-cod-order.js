@@ -78,6 +78,27 @@ function normalizeIndianState(inputState, zipCode) {
   return { province: inputState.trim(), province_code: undefined };
 }
 
+async function getShopifyAccessToken() {
+  const shopifyDomain = process.env.SHOPIFY_STORE_DOMAIN || 'a1vwxm-qr.myshopify.com';
+  const clientId = process.env.SHOPIFY_CLIENT_ID;
+  const clientSecret = process.env.SHOPIFY_CLIENT_SECRET;
+  if (clientId && clientSecret) {
+    try {
+      const url = `https://${shopifyDomain}/admin/oauth/access_token`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ client_id: clientId, client_secret: clientSecret })
+      });
+      const data = await response.json();
+      if (response.ok && data.access_token) return data.access_token;
+    } catch (e) {
+      console.error('[Shopify OAuth] Token exchange error:', e.message);
+    }
+  }
+  return process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -86,7 +107,7 @@ module.exports = async function handler(req, res) {
   try {
     const { customerData = {}, orderInfo = {} } = req.body || {};
     const shopifyDomain = process.env.SHOPIFY_STORE_DOMAIN || 'a1vwxm-qr.myshopify.com';
-    const shopifyToken = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
+    const shopifyToken = await getShopifyAccessToken();
 
     if (!shopifyToken) {
       return res.status(200).json({
@@ -105,15 +126,17 @@ module.exports = async function handler(req, res) {
     const formattedPhone = phone ? (phone.startsWith('+') ? phone : `+91${phone.replace(/\D/g, '').slice(-10)}`) : undefined;
     const stateInfo = normalizeIndianState(rawState, zip);
 
+    const qty = Math.max(1, parseInt(orderInfo.quantity || 1, 10));
     const totalAmount = orderInfo.amountInRupees || 899;
+    const unitPrice = parseFloat((totalAmount / qty).toFixed(2));
 
     const payload = {
       order: {
         line_items: [
           {
             variant_id: parseInt(orderInfo.variantId || '49072796926187', 10),
-            quantity: parseInt(orderInfo.quantity || 1, 10),
-            price: totalAmount,
+            quantity: qty,
+            price: unitPrice,
             title: `Simpliven™ Smart Digital LED Mirror Alarm Clock (${orderInfo.bundleName || 'Standard'})`
           }
         ],

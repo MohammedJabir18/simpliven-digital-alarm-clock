@@ -160,13 +160,17 @@ async function createShopifyAdminOrder({ customerData = {}, orderInfo = {}, razo
   const formattedPhone = phone ? (phone.startsWith('+') ? phone : `+91${phone.replace(/\D/g, '').slice(-10)}`) : undefined;
   const stateInfo = normalizeIndianState(rawState, zip);
 
+  const qty = Math.max(1, parseInt(orderInfo.quantity || 1, 10));
+  const totalOrderAmount = orderInfo.amountInRupees || 799;
+  const unitPrice = parseFloat((totalOrderAmount / qty).toFixed(2));
+
   const payload = {
     order: {
       line_items: [
         {
           variant_id: parseInt(orderInfo.variantId || '49072796926187', 10),
-          quantity: parseInt(orderInfo.quantity || 1, 10),
-          price: orderInfo.amountInRupees || 799,
+          quantity: qty,
+          price: unitPrice,
           title: `Simpliven™ Smart Digital LED Mirror Alarm Clock (${orderInfo.bundleName || 'Standard'})`
         }
       ],
