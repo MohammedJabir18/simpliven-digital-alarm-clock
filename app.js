@@ -870,6 +870,37 @@ function showOrderSuccessModal(verifyResult, razorpayResponse, customerData, bun
         itemEl.textContent = `Simpliven™ Smart Digital LED Mirror Alarm Clock (${bundleName || 'Standard'})`;
     }
 
+    // Populate Payment Method & Doorstep Balance Details
+    const payMethodEl = document.getElementById('success-payment-method');
+    const doorstepBalEl = document.getElementById('success-doorstep-balance');
+
+    const qty = appState.selectedBundle || 1;
+    const bundle = appState.prices[qty] || appState.prices[1];
+    const basePrepaid = bundle.base;
+    const partialTotal = basePrepaid + 50;
+    const partialBal = partialTotal - 99;
+    const codTotal = basePrepaid + 100;
+
+    let paymentMethodText = '⚡ Full Prepaid Online (100% Paid)';
+    let doorstepText = '₹0.00 (Fully Paid Online)';
+
+    if (appState.paymentMode === 'prepaid') {
+        paymentMethodText = `⚡ Full Prepaid Online (Paid ₹${basePrepaid.toLocaleString('en-IN')})`;
+        doorstepText = `₹0.00 (Fully Paid Online)`;
+        if (payMethodEl) payMethodEl.innerHTML = `<span style="color:#059669">${paymentMethodText}</span>`;
+        if (doorstepBalEl) doorstepBalEl.innerHTML = `<span style="color:#059669">${doorstepText}</span>`;
+    } else if (appState.paymentMode === 'partial_cod') {
+        paymentMethodText = `🛡️ Partial COD (₹99 Deposit Paid via UPI)`;
+        doorstepText = `₹${partialBal.toLocaleString('en-IN')} (Pay Cash/UPI at Doorstep)`;
+        if (payMethodEl) payMethodEl.innerHTML = `<span style="color:#74121D">${paymentMethodText}</span>`;
+        if (doorstepBalEl) doorstepBalEl.innerHTML = `<span style="color:#74121D; font-weight:800;">${doorstepText}</span>`;
+    } else if (appState.paymentMode === 'cod') {
+        paymentMethodText = `📦 Full Cash on Delivery (COD)`;
+        doorstepText = `₹${codTotal.toLocaleString('en-IN')} (Pay 100% Cash/UPI at Doorstep)`;
+        if (payMethodEl) payMethodEl.innerHTML = `<span style="color:#b45309">${paymentMethodText}</span>`;
+        if (doorstepBalEl) doorstepBalEl.innerHTML = `<span style="color:#b45309; font-weight:800;">${doorstepText}</span>`;
+    }
+
     // Populate Shipping Address
     const addressEl = document.getElementById('success-shipping-address');
     if (addressEl && customerData) {
@@ -885,7 +916,8 @@ function showOrderSuccessModal(verifyResult, razorpayResponse, customerData, bun
     const waBtn = document.getElementById('success-whatsapp-btn');
     if (waBtn && customerData) {
         const num = orderNumEl ? orderNumEl.textContent : '';
-        const msg = encodeURIComponent(`Hi Simpliven! I just completed my prepaid payment for Order ${num} (Payment ID: ${razorpayResponse.razorpay_payment_id}). Please send express tracking updates.`);
+        const modeLabel = appState.paymentMode === 'prepaid' ? 'Prepaid' : (appState.paymentMode === 'partial_cod' ? 'Partial COD (₹99 Paid)' : 'Full COD');
+        const msg = encodeURIComponent(`Hi Simpliven! I just placed Order ${num} via ${modeLabel}. Please send express tracking updates.`);
         waBtn.href = `https://wa.me/919061613233?text=${msg}`;
     }
 
