@@ -139,7 +139,7 @@ function normalizeIndianState(inputState, zipCode) {
 
 async function createShopifyAdminOrder({ customerData = {}, orderInfo = {}, razorpayPaymentId, razorpayOrderId }) {
   const shopifyDomain = process.env.SHOPIFY_STORE_DOMAIN || 'a1vwxm-qr.myshopify.com';
-  const shopifyToken = await getShopifyAccessToken();
+  let shopifyToken = await getShopifyAccessToken();
 
   if (!shopifyToken) {
     console.warn('[Shopify Admin API] SHOPIFY_ADMIN_ACCESS_TOKEN not set. Order recorded in Razorpay only.');
@@ -154,8 +154,57 @@ async function createShopifyAdminOrder({ customerData = {}, orderInfo = {}, razo
   const formattedPhone = phone ? (phone.startsWith('+') ? phone : `+91${phone.replace(/\D/g, '').slice(-10)}`) : undefined;
   const stateInfo = normalizeIndianState(rawState, zip);
 
+  const isCod = orderInfo.paymentMode === 'cod';
+  const isPartialCod = orderInfo.paymentMode === 'partial_cod';
   const qty = Math.max(1, parseInt(orderInfo.quantity || 1, 10));
-  const totalOrderAmount = orderInfo.amountInRupees || 799;
+
+  let financialStatus = 'paid';
+  let noteText = `Paid via Razorpay Web Checkout | Payment ID: ${razorpayPaymentId || 'N/A'} | Order ID: ${razorpayOrderId || 'N/A'}`;
+  let tagText = 'Razorpay, Prepaid, Single Product Funnel';
+  let totalOrderAmount = orderInfo.amountInRupees || 799;
+
+  let transactionsArr = [
+    {
+      kind: 'sale',
+      status: 'success',
+      amount: totalOrderAmount,
+      gateway: 'Razorpay',
+      payment_id: razorpayPaymentId
+    }
+  ];
+
+  if (isPartialCod) {
+    financialStatus = 'partially_paid';
+    const basePrepaid = orderInfo.basePrepaid || (qty === 1 ? 799 : (qty === 2 ? 1499 : 1999));
+    totalOrderAmount = basePrepaid + 50;
+    const balanceToCollect = totalOrderAmount - 99;
+    noteText = `Partial COD: ₹99 Deposit Paid via Razorpay (Payment ID: ${razorpayPaymentId}) | Balance ₹${balanceToCollect} to collect on delivery`;
+    tagText = 'Partial COD, ₹99 Deposit Paid, Single Product Funnel';
+    transactionsArr = [
+      {
+        kind: 'sale',
+        status: 'success',
+        amount: 99,
+        gateway: 'Razorpay (Deposit)',
+        payment_id: razorpayPaymentId
+      }
+    ];
+  } else if (isCod) {
+    financialStatus = 'pending';
+    const basePrepaid = orderInfo.basePrepaid || (qty === 1 ? 799 : (qty === 2 ? 1499 : 1999));
+    totalOrderAmount = basePrepaid + 100;
+    noteText = `Full Cash on Delivery: Collect ₹${totalOrderAmount} on delivery`;
+    tagText = 'COD, Cash on Delivery, Single Product Funnel';
+    transactionsArr = [
+      {
+        kind: 'sale',
+        status: 'pending',
+        amount: totalOrderAmount,
+        gateway: 'Cash on Delivery (COD)'
+      }
+    ];
+  }
+
   const unitPrice = parseFloat((totalOrderAmount / qty).toFixed(2));
 
   const payload = {
@@ -198,24 +247,16 @@ async function createShopifyAdminOrder({ customerData = {}, orderInfo = {}, razo
         zip: zip,
         phone: formattedPhone
       },
-      financial_status: 'paid',
-      transactions: [
-        {
-          kind: 'sale',
-          status: 'success',
-          amount: orderInfo.amountInRupees || 799,
-          gateway: 'Razorpay',
-          payment_id: razorpayPaymentId
-        }
-      ],
-      note: `Paid via Razorpay Web Checkout | Payment ID: ${razorpayPaymentId} | Order ID: ${razorpayOrderId}`,
-      tags: 'Razorpay, Prepaid, Single Product Funnel'
+      financial_status: financialStatus,
+      transactions: transactionsArr,
+      note: noteText,
+      tags: tagText
     }
   };
 
   try {
     const url = `https://${shopifyDomain}/admin/api/2024-01/orders.json`;
-    const response = await fetch(url, {
+    let response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -223,6 +264,19 @@ async function createShopifyAdminOrder({ customerData = {}, orderInfo = {}, razo
       },
       body: JSON.stringify(payload)
     });
+
+    if (response.status === 401) {
+      console.warn('[Shopify Admin API] 401 Unauthorized. Force refreshing Spring 26 OAuth token...');
+      shopifyToken = await getShopifyAccessToken(true);
+      response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Shopify-Access-Token': shopifyToken
+        },
+        body: JSON.stringify(payload)
+      });
+    }
 
     const resJson = await response.json();
     if (response.ok && resJson.order) {
