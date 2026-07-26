@@ -962,6 +962,60 @@
                         </div>
                     </div>
 
+                    <!-- Payment Option Cards (3-Tier Pricing Architecture) -->
+                    <div class="payment-options-section">
+                        <label class="payment-section-label">SELECT PAYMENT METHOD &amp; SAVE</label>
+                        <div class="payment-methods-grid" role="radiogroup" aria-label="Payment Mode Options">
+                            <!-- Option 1: Full Prepaid (Default) -->
+                            <label class="payment-method-card active" data-paymode="prepaid">
+                                <input type="radio" name="payment-mode" value="prepaid" checked />
+                                <div class="payment-card-content">
+                                    <div class="payment-card-header">
+                                        <span class="payment-method-title">⚡ Full Prepaid (Best Value)</span>
+                                        <span class="payment-badge save-pill">SAVE EXTRA</span>
+                                    </div>
+                                    <div class="payment-card-desc">Pay 100% online now via UPI / GPay / Cards / NetBanking</div>
+                                    <div class="payment-card-price-row">
+                                        <strong class="payment-price-tag" id="paymode-price-prepaid">₹799</strong>
+                                        <span class="payment-benefit">FREE Priority Express Shipping</span>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <!-- Option 2: Partial COD (Pay ₹99 Deposit Now) -->
+                            <label class="payment-method-card" data-paymode="partial_cod">
+                                <input type="radio" name="payment-mode" value="partial_cod" />
+                                <div class="payment-card-content">
+                                    <div class="payment-card-header">
+                                        <span class="payment-method-title">🛡️ Partial COD (Pay ₹99 Deposit Now)</span>
+                                        <span class="payment-badge popular-pill">MOST POPULAR</span>
+                                    </div>
+                                    <div class="payment-card-desc">Pay ₹99 deposit via UPI now • Pay balance at doorstep</div>
+                                    <div class="payment-card-price-row">
+                                        <strong class="payment-price-tag" id="paymode-price-partial">₹849 Total</strong>
+                                        <span class="payment-benefit">(₹99 Deposit + <span id="paymode-bal-partial">₹750</span> Cash/UPI at Doorstep)</span>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <!-- Option 3: Full Cash on Delivery -->
+                            <label class="payment-method-card" data-paymode="cod">
+                                <input type="radio" name="payment-mode" value="cod" />
+                                <div class="payment-card-content">
+                                    <div class="payment-card-header">
+                                        <span class="payment-method-title">📦 Full Cash on Delivery</span>
+                                        <span class="payment-badge standard-pill">STANDARD COD</span>
+                                    </div>
+                                    <div class="payment-card-desc">Pay 100% Cash or UPI scan to courier executive upon delivery</div>
+                                    <div class="payment-card-price-row">
+                                        <strong class="payment-price-tag" id="paymode-price-cod">₹899 Total</strong>
+                                        <span class="payment-benefit">Includes ₹100 COD Handling &amp; Verification Fee</span>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
                     <div id="form-error-msg" class="form-error-banner" hidden></div>
 
                     <button type="submit" id="submit-shipping-btn" class="btn-brutalist btn-modal-submit">

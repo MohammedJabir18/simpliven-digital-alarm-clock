@@ -184,6 +184,54 @@ async function createShopifyAdminOrder({ customerData = {}, orderInfo = {}, razo
   const formattedPhone = phone ? (phone.startsWith('+') ? phone : `+91${phone.replace(/\D/g, '').slice(-10)}`) : undefined;
   const stateInfo = normalizeIndianState(rawState, zip);
 
+  const isCod = orderInfo.paymentMode === 'cod';
+  const isPartialCod = orderInfo.paymentMode === 'partial_cod';
+
+  let financialStatus = 'paid';
+  let noteText = `Paid via Razorpay Web Checkout | Payment ID: ${razorpayPaymentId || 'N/A'} | Order ID: ${razorpayOrderId || 'N/A'}`;
+  let tagText = 'Razorpay, Prepaid, Single Product Funnel';
+  let transactionsArr = [
+    {
+      kind: 'sale',
+      status: 'success',
+      amount: orderInfo.amountInRupees || 799,
+      gateway: 'Razorpay',
+      payment_id: razorpayPaymentId
+    }
+  ];
+
+  if (isPartialCod) {
+    financialStatus = 'partially_paid';
+    const qty = parseInt(orderInfo.quantity || 1, 10);
+    const basePrepaid = orderInfo.basePrepaid || (qty === 1 ? 799 : (qty === 2 ? 1499 : 1999));
+    const totalAmount = basePrepaid + 50;
+    const balanceToCollect = totalAmount - 99;
+    noteText = `Partial COD: ₹99 Deposit Paid via Razorpay (Payment ID: ${razorpayPaymentId}) | Balance ₹${balanceToCollect} to collect on delivery`;
+    tagText = 'Partial COD, ₹99 Deposit Paid, Single Product Funnel';
+    transactionsArr = [
+      {
+        kind: 'sale',
+        status: 'success',
+        amount: 99,
+        gateway: 'Razorpay (Deposit)',
+        payment_id: razorpayPaymentId
+      }
+    ];
+  } else if (isCod) {
+    financialStatus = 'pending';
+    const totalAmount = orderInfo.amountInRupees || 899;
+    noteText = `Full Cash on Delivery: Collect ₹${totalAmount} on delivery`;
+    tagText = 'COD, Cash on Delivery, Single Product Funnel';
+    transactionsArr = [
+      {
+        kind: 'sale',
+        status: 'pending',
+        amount: totalAmount,
+        gateway: 'Cash on Delivery (COD)'
+      }
+    ];
+  }
+
   const payload = {
     order: {
       line_items: [
@@ -224,18 +272,10 @@ async function createShopifyAdminOrder({ customerData = {}, orderInfo = {}, razo
         zip: zip,
         phone: formattedPhone
       },
-      financial_status: 'paid',
-      transactions: [
-        {
-          kind: 'sale',
-          status: 'success',
-          amount: orderInfo.amountInRupees || 799,
-          gateway: 'Razorpay',
-          payment_id: razorpayPaymentId
-        }
-      ],
-      note: `Paid via Razorpay Web Checkout | Payment ID: ${razorpayPaymentId} | Order ID: ${razorpayOrderId}`,
-      tags: 'Razorpay, Prepaid, Single Product Funnel'
+      financial_status: financialStatus,
+      transactions: transactionsArr,
+      note: noteText,
+      tags: tagText
     }
   };
 
@@ -370,6 +410,38 @@ app.post('/api/verify-payment', async (req, res) => {
     return res.status(500).json({
       success: false,
       error: error.message || 'Server error during signature verification',
+    });
+  }
+});
+
+/**
+ * STEP 4: BACKEND - Create Cash on Delivery (COD) Order in Shopify Admin
+ * Endpoint: POST /api/create-cod-order
+ */
+app.post('/api/create-cod-order', async (req, res) => {
+  try {
+    const { customerData, orderInfo } = req.body;
+    const codOrderInfo = { ...(orderInfo || {}), paymentMode: 'cod' };
+
+    const shopifyResult = await createShopifyAdminOrder({
+      customerData,
+      orderInfo: codOrderInfo,
+      razorpayPaymentId: 'COD_DOORSTEP',
+      razorpayOrderId: `cod_${Date.now()}`
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Cash on Delivery order confirmed successfully',
+      order_id: `cod_${Date.now()}`,
+      payment_id: 'COD_DOORSTEP',
+      shopify_order: shopifyResult,
+    });
+  } catch (error) {
+    console.error('[COD Order Error]:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message || 'Server error creating COD order',
     });
   }
 });

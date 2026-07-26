@@ -431,11 +431,80 @@ function initAddressModal() {
         });
     }
 
+    // Initialize 3-Tier Payment Option Cards
+    initPaymentModeSelector();
+
     // Form Submit
     form.addEventListener('submit', (e) => {
         e.preventDefault();
         handleShippingFormSubmit();
     });
+}
+
+function initPaymentModeSelector() {
+    const cardLabels = document.querySelectorAll('.payment-method-card');
+    cardLabels.forEach(card => {
+        card.addEventListener('click', () => {
+            const paymode = card.getAttribute('data-paymode');
+            if (!paymode) return;
+
+            appState.paymentMode = paymode;
+
+            cardLabels.forEach(c => {
+                const isTarget = c === card;
+                c.classList.toggle('active', isTarget);
+                const radio = c.querySelector('input[type="radio"]');
+                if (radio) radio.checked = isTarget;
+            });
+
+            updatePaymentOptionsUI();
+        });
+    });
+}
+
+function updatePaymentOptionsUI() {
+    const qty = appState.selectedBundle || 1;
+    const bundle = appState.prices[qty] || appState.prices[1];
+    const basePrepaid = bundle.base; // 799, 1499, 1999
+
+    const prepaidPrice = basePrepaid;
+    const partialPrice = basePrepaid + 50; // ₹849, ₹1549, ₹2049 Total
+    const codPrice = basePrepaid + 100;     // ₹899, ₹1599, ₹2099 Total
+
+    const partialDeposit = 99;
+    const partialBalance = partialPrice - partialDeposit; // ₹750, ₹1450, ₹1950
+
+    const elPrepaid = document.getElementById('paymode-price-prepaid');
+    const elPartial = document.getElementById('paymode-price-partial');
+    const elPartialBal = document.getElementById('paymode-bal-partial');
+    const elCod = document.getElementById('paymode-price-cod');
+
+    if (elPrepaid) elPrepaid.textContent = `₹${prepaidPrice.toLocaleString('en-IN')}`;
+    if (elPartial) elPartial.textContent = `₹${partialPrice.toLocaleString('en-IN')} Total`;
+    if (elPartialBal) elPartialBal.textContent = `₹${partialBalance.toLocaleString('en-IN')}`;
+    if (elCod) elCod.textContent = `₹${codPrice.toLocaleString('en-IN')} Total`;
+
+    const submitBtn = document.getElementById('submit-shipping-btn');
+    if (submitBtn && !submitBtn.disabled && submitBtn.textContent !== 'PAYMENT VERIFIED! ✅') {
+        if (appState.paymentMode === 'prepaid') {
+            submitBtn.textContent = `PAY ₹${prepaidPrice.toLocaleString('en-IN')} NOW & LOCK ORDER ➔`;
+        } else if (appState.paymentMode === 'partial_cod') {
+            submitBtn.textContent = `PAY ₹99 DEPOSIT VIA UPI ➔`;
+        } else if (appState.paymentMode === 'cod') {
+            submitBtn.textContent = `CONFIRM CASH ON DELIVERY (₹${codPrice.toLocaleString('en-IN')}) ➔`;
+        }
+    }
+
+    const summaryPaymentEl = document.getElementById('modal-summary-payment');
+    if (summaryPaymentEl) {
+        if (appState.paymentMode === 'prepaid') {
+            summaryPaymentEl.textContent = `Prepaid online (₹${prepaidPrice.toLocaleString('en-IN')})`;
+        } else if (appState.paymentMode === 'partial_cod') {
+            summaryPaymentEl.textContent = `Partial COD (₹99 Deposit + ₹${partialBalance.toLocaleString('en-IN')} on Delivery)`;
+        } else {
+            summaryPaymentEl.textContent = `Full Cash on Delivery (₹${codPrice.toLocaleString('en-IN')})`;
+        }
+    }
 }
 
 function autoDetectStateFromZip(zipCode) {
@@ -480,15 +549,25 @@ function resetAddressFormSubmitButton() {
     const submitBtn = document.getElementById('submit-shipping-btn');
     if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'PROCEED TO SECURE PAYMENT ➔';
         submitBtn.style.background = '';
     }
     window.isPaymentCompletedSuccessfully = false;
+    updatePaymentOptionsUI();
 }
 
 function openAddressModal() {
     const modal = document.getElementById('address-modal');
     if (!modal) return;
+
+    // Default to Prepaid on open
+    appState.paymentMode = 'prepaid';
+    const cardLabels = document.querySelectorAll('.payment-method-card');
+    cardLabels.forEach(card => {
+        const isPrepaid = card.getAttribute('data-paymode') === 'prepaid';
+        card.classList.toggle('active', isPrepaid);
+        const radio = card.querySelector('input[type="radio"]');
+        if (radio) radio.checked = isPrepaid;
+    });
 
     // Reset submit button & payment flag for fresh ordering
     resetAddressFormSubmitButton();
@@ -630,21 +709,66 @@ function handleShippingFormSubmit() {
     // Loading State
     if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.textContent = 'OPENING SECURE PAYMENT...';
+        submitBtn.textContent = appState.paymentMode === 'cod' ? 'CREATING COD ORDER...' : 'OPENING SECURE PAYMENT...';
     }
 
     const qty = appState.selectedBundle;
-    const priceInRupees = calculatePrice();
-    const bundleObj = appState.prices[qty];
+    const bundleObj = appState.prices[qty] || appState.prices[1];
+    const basePrepaid = bundleObj.base;
     const bundleName = bundleObj ? bundleObj.name : `${qty} Units`;
+
+    // Determine amount to charge via Razorpay
+    let amountInRupees = basePrepaid;
+    if (appState.paymentMode === 'partial_cod') {
+        amountInRupees = 99; // Charge ₹99 upfront deposit
+    } else if (appState.paymentMode === 'cod') {
+        amountInRupees = basePrepaid + 100; // Total COD amount
+    }
 
     // Reset completion flag for new checkout session
     window.isPaymentCompletedSuccessfully = false;
 
-    // Trigger Razorpay Web Checkout if available
+    // Handle Option 3: Full Cash on Delivery (No Razorpay popup)
+    if (appState.paymentMode === 'cod') {
+        const createCodUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port !== '3000' && window.location.port !== ''
+            ? 'http://localhost:3000/api/create-cod-order'
+            : '/api/create-cod-order';
+
+        fetch(createCodUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                customerData: addressData,
+                orderInfo: {
+                    amountInRupees: amountInRupees,
+                    quantity: qty,
+                    bundleName: bundleName,
+                    paymentMode: 'cod'
+                }
+            })
+        })
+        .then(res => res.json())
+        .then(result => {
+            if (submitBtn) {
+                submitBtn.textContent = 'ORDER PLACED! ✅';
+                submitBtn.style.background = '#10B981';
+            }
+            showOrderSuccessModal(result, { razorpay_payment_id: 'COD_DOORSTEP' }, addressData, bundleName);
+        })
+        .catch(err => {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                resetAddressFormSubmitButton();
+            }
+            showOrderFailureModal('Could not confirm Cash on Delivery order. Please try again.', addressData);
+        });
+        return;
+    }
+
+    // Handle Option 1 (Prepaid) & Option 2 (Partial COD ₹99 Deposit) via Razorpay
     if (window.SimplivenRazorpay && typeof window.SimplivenRazorpay.startRazorpayCheckout === 'function') {
         window.SimplivenRazorpay.startRazorpayCheckout({
-            amountInRupees: priceInRupees,
+            amountInRupees: amountInRupees,
             quantity: qty,
             customerData: addressData,
             bundleName: bundleName,
@@ -659,14 +783,14 @@ function handleShippingFormSubmit() {
             onError: (errMsg) => {
                 if (submitBtn) {
                     submitBtn.disabled = false;
-                    submitBtn.textContent = 'PROCEED TO SECURE PAYMENT ➔';
+                    resetAddressFormSubmitButton();
                 }
                 showOrderFailureModal(errMsg || 'Payment signature verification failed.', addressData);
             },
             onDismiss: () => {
                 if (submitBtn) {
                     submitBtn.disabled = false;
-                    submitBtn.textContent = 'PROCEED TO SECURE PAYMENT ➔';
+                    resetAddressFormSubmitButton();
                 }
                 showOrderFailureModal('Checkout was cancelled or closed by user. No money was deducted.', addressData);
             }
