@@ -730,9 +730,7 @@ function handleShippingFormSubmit() {
 
     // Handle Option 3: Full Cash on Delivery (No Razorpay popup)
     if (appState.paymentMode === 'cod') {
-        const createCodUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port !== '3000' && window.location.port !== ''
-            ? 'http://localhost:3000/api/create-cod-order'
-            : '/api/create-cod-order';
+        const createCodUrl = getApiEndpoint('/api/create-cod-order');
 
         fetch(createCodUrl, {
             method: 'POST',
@@ -747,8 +745,11 @@ function handleShippingFormSubmit() {
                 }
             })
         })
-        .then(res => res.json())
-        .then(result => {
+        .then(async (res) => {
+            const result = await res.json().catch(() => ({}));
+            if (!res.ok || !result.success) {
+                throw new Error(result.error || 'Could not confirm Cash on Delivery order.');
+            }
             if (submitBtn) {
                 submitBtn.textContent = 'ORDER PLACED! ✅';
                 submitBtn.style.background = '#10B981';
@@ -760,10 +761,19 @@ function handleShippingFormSubmit() {
                 submitBtn.disabled = false;
                 resetAddressFormSubmitButton();
             }
-            showOrderFailureModal('Could not confirm Cash on Delivery order. Please try again.', addressData);
+            showOrderFailureModal(err.message || 'Could not confirm Cash on Delivery order. Please try again.', addressData);
         });
         return;
     }
+
+function getApiEndpoint(endpoint) {
+    if (typeof window === 'undefined') return endpoint;
+    const isLocalhostDev = window.location.protocol === 'file:' || 
+                           ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && 
+                            window.location.port !== '3000' && window.location.port !== '');
+    const baseUrl = isLocalhostDev ? 'http://localhost:3000' : '';
+    return `${baseUrl}${endpoint}`;
+}
 
     // Handle Option 1 (Prepaid) & Option 2 (Partial COD ₹99 Deposit) via Razorpay
     if (window.SimplivenRazorpay && typeof window.SimplivenRazorpay.startRazorpayCheckout === 'function') {
