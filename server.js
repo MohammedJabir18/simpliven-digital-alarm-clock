@@ -23,9 +23,11 @@ const razorpay = new Razorpay({
 
 // Auto-retrieve or refresh Shopify Access Token using Client ID & Secret
 let cachedShopifyToken = null;
+let tokenExpiryTime = 0;
 
 async function getShopifyAccessToken(forceRefresh = false) {
-  if (!forceRefresh && cachedShopifyToken) {
+  const now = Date.now();
+  if (!forceRefresh && cachedShopifyToken && now < tokenExpiryTime) {
     return cachedShopifyToken;
   }
 
@@ -35,25 +37,30 @@ async function getShopifyAccessToken(forceRefresh = false) {
 
   if (clientId && clientSecret) {
     try {
+      const params = new URLSearchParams();
+      params.append('grant_type', 'client_credentials');
+      params.append('client_id', clientId);
+      params.append('client_secret', clientSecret);
+
       const url = `https://${shopifyDomain}/admin/oauth/access_token`;
       const response = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          client_id: clientId,
-          client_secret: clientSecret
-        })
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString()
       });
+
       const data = await response.json();
       if (response.ok && data.access_token) {
         cachedShopifyToken = data.access_token;
+        tokenExpiryTime = now + ((data.expires_in || 86400) - 300) * 1000;
+        console.log('[Shopify OAuth] Successfully retrieved fresh Spring 26 Admin token!');
         return data.access_token;
       }
     } catch (e) {
       console.error('[Shopify OAuth] Token exchange error:', e.message);
     }
   }
-  return process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
+  return cachedShopifyToken || process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
 }
 
 // Indian States Mapping Table for Shopify Admin API
@@ -286,7 +293,7 @@ async function createShopifyAdminOrder({ customerData = {}, orderInfo = {}, razo
 
   try {
     const url = `https://${shopifyDomain}/admin/api/2024-01/orders.json`;
-    const response = await fetch(url, {
+    let response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -294,6 +301,19 @@ async function createShopifyAdminOrder({ customerData = {}, orderInfo = {}, razo
       },
       body: JSON.stringify(payload)
     });
+
+    if (response.status === 401) {
+      console.warn('[Shopify Admin API] 401 Unauthorized. Force refreshing Spring 26 OAuth Token...');
+      shopifyToken = await getShopifyAccessToken(true);
+      response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Shopify-Access-Token': shopifyToken
+        },
+        body: JSON.stringify(payload)
+      });
+    }
 
     const resJson = await response.json();
     if (response.ok && resJson.order) {

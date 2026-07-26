@@ -1,31 +1,25 @@
 const crypto = require('crypto');
 
 async function getShopifyAccessToken() {
-  if (process.env.SHOPIFY_ADMIN_ACCESS_TOKEN && process.env.SHOPIFY_ADMIN_ACCESS_TOKEN.startsWith('shpat_')) {
-    return process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
-  }
-
   const shopifyDomain = process.env.SHOPIFY_STORE_DOMAIN || 'a1vwxm-qr.myshopify.com';
   const clientId = process.env.SHOPIFY_CLIENT_ID;
   const clientSecret = process.env.SHOPIFY_CLIENT_SECRET;
 
   if (clientId && clientSecret) {
     try {
+      const params = new URLSearchParams();
+      params.append('grant_type', 'client_credentials');
+      params.append('client_id', clientId);
+      params.append('client_secret', clientSecret);
+
       const url = `https://${shopifyDomain}/admin/oauth/access_token`;
       const response = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          client_id: clientId,
-          client_secret: clientSecret,
-          grant_type: 'client_credentials'
-        })
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString()
       });
       const data = await response.json();
-      if (response.ok && data.access_token) {
-        process.env.SHOPIFY_ADMIN_ACCESS_TOKEN = data.access_token;
-        return data.access_token;
-      }
+      if (response.ok && data.access_token) return data.access_token;
     } catch (e) {
       console.error('[Shopify OAuth] Token exchange error:', e.message);
     }
