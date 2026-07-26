@@ -104,28 +104,15 @@ function updateStorefrontPrices() {
     const price = calculatePrice();
     const formattedPrice = `₹${price.toLocaleString('en-IN')}`;
     
-    // Update Hero CTA Button (Awwwards-Tier Interactive Layout)
+    // Update Hero CTA Button
     const heroCheckoutBtn = document.getElementById('hero-checkout-trigger');
     if (heroCheckoutBtn) {
         heroCheckoutBtn.innerHTML = `
-            <div class="awwwards-btn-glow-ring"></div>
-            <div class="awwwards-btn-content">
-                <div class="awwwards-btn-left">
-                    <span class="awwwards-pulse-dot"></span>
-                    <span class="awwwards-badge-text">EXPRESS AIR DISPATCH</span>
-                </div>
-                <div class="awwwards-btn-center">
-                    <span class="awwwards-action-title">ORDER NOW</span>
-                    <span class="awwwards-price-tag" id="hero-btn-price-display">— ${formattedPrice}</span>
-                </div>
-                <div class="awwwards-btn-arrow">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                        <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
-                </div>
-            </div>
-            <div class="awwwards-btn-shine"></div>
+            <span class="btn-cta-text">ORDER NOW — ${formattedPrice}</span>
+            <svg class="btn-cta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
         `;
     }
 
@@ -142,28 +129,15 @@ function updateStorefrontPrices() {
         originalPriceText.innerText = `₹${originalPrice.toLocaleString('en-IN')}.00`;
     }
 
-    // Update Final CTA Button (Awwwards-Tier Interactive Layout)
+    // Update Final CTA Button
     const finalCheckoutBtn = document.getElementById('final-checkout-btn');
     if (finalCheckoutBtn) {
         finalCheckoutBtn.innerHTML = `
-            <div class="awwwards-btn-glow-ring"></div>
-            <div class="awwwards-btn-content">
-                <div class="awwwards-btn-left">
-                    <span class="awwwards-pulse-dot"></span>
-                    <span class="awwwards-badge-text">INSTANT CHECKOUT</span>
-                </div>
-                <div class="awwwards-btn-center">
-                    <span class="awwwards-action-title">SECURE CHECKOUT</span>
-                    <span class="awwwards-price-tag">— ${formattedPrice}</span>
-                </div>
-                <div class="awwwards-btn-arrow">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                        <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
-                </div>
-            </div>
-            <div class="awwwards-btn-shine"></div>
+            <span class="btn-cta-text">SECURE CHECKOUT — ${formattedPrice}</span>
+            <svg class="btn-cta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
         `;
     }
 
