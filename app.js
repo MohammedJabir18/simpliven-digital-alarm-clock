@@ -97,24 +97,36 @@ async function initShopifyLiveData() {
 
 function calculatePrice() {
     const bundle = appState.prices[appState.selectedBundle];
-    let finalPrice = bundle.base;
-
-    if (appState.paymentMode === 'prepaid') {
-        finalPrice = finalPrice - 50; // Prepaid discount ₹50
-    } else {
-        finalPrice = finalPrice + 49; // COD fee ₹49
-    }
-    return finalPrice;
+    return bundle.base;
 }
 
 function updateStorefrontPrices() {
     const price = calculatePrice();
     const formattedPrice = `₹${price.toLocaleString('en-IN')}`;
     
-    // Update Hero CTA Button
+    // Update Hero CTA Button (Awwwards-Tier Interactive Layout)
     const heroCheckoutBtn = document.getElementById('hero-checkout-trigger');
     if (heroCheckoutBtn) {
-        heroCheckoutBtn.innerHTML = `<span>Order Now — ${formattedPrice}</span><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
+        heroCheckoutBtn.innerHTML = `
+            <div class="awwwards-btn-glow-ring"></div>
+            <div class="awwwards-btn-content">
+                <div class="awwwards-btn-left">
+                    <span class="awwwards-pulse-dot"></span>
+                    <span class="awwwards-badge-text">EXPRESS AIR DISPATCH</span>
+                </div>
+                <div class="awwwards-btn-center">
+                    <span class="awwwards-action-title">ORDER NOW</span>
+                    <span class="awwwards-price-tag" id="hero-btn-price-display">— ${formattedPrice}</span>
+                </div>
+                <div class="awwwards-btn-arrow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </div>
+            </div>
+            <div class="awwwards-btn-shine"></div>
+        `;
     }
 
     // Update Price display in Hero Details
@@ -130,10 +142,29 @@ function updateStorefrontPrices() {
         originalPriceText.innerText = `₹${originalPrice.toLocaleString('en-IN')}.00`;
     }
 
-    // Update Final CTA Button
+    // Update Final CTA Button (Awwwards-Tier Interactive Layout)
     const finalCheckoutBtn = document.getElementById('final-checkout-btn');
     if (finalCheckoutBtn) {
-        finalCheckoutBtn.innerText = `SECURE CHECKOUT • ${formattedPrice}`;
+        finalCheckoutBtn.innerHTML = `
+            <div class="awwwards-btn-glow-ring"></div>
+            <div class="awwwards-btn-content">
+                <div class="awwwards-btn-left">
+                    <span class="awwwards-pulse-dot"></span>
+                    <span class="awwwards-badge-text">INSTANT CHECKOUT</span>
+                </div>
+                <div class="awwwards-btn-center">
+                    <span class="awwwards-action-title">SECURE CHECKOUT</span>
+                    <span class="awwwards-price-tag">— ${formattedPrice}</span>
+                </div>
+                <div class="awwwards-btn-arrow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </div>
+            </div>
+            <div class="awwwards-btn-shine"></div>
+        `;
     }
 
     // Update Sticky Drawer Info
