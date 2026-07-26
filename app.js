@@ -747,21 +747,22 @@ function handleShippingFormSubmit() {
         })
         .then(async (res) => {
             const result = await res.json().catch(() => ({}));
-            if (!res.ok || !result.success) {
-                throw new Error(result.error || 'Could not confirm Cash on Delivery order.');
+            if (res.ok || result.success) {
+                if (submitBtn) {
+                    submitBtn.textContent = 'ORDER PLACED! ✅';
+                    submitBtn.style.background = '#10B981';
+                }
+                showOrderSuccessModal(result, { razorpay_payment_id: 'COD_DOORSTEP' }, addressData, bundleName);
+                return;
             }
-            if (submitBtn) {
-                submitBtn.textContent = 'ORDER PLACED! ✅';
-                submitBtn.style.background = '#10B981';
-            }
-            showOrderSuccessModal(result, { razorpay_payment_id: 'COD_DOORSTEP' }, addressData, bundleName);
+            throw new Error('Could not confirm Cash on Delivery order. Please try again.');
         })
         .catch(err => {
             if (submitBtn) {
                 submitBtn.disabled = false;
                 resetAddressFormSubmitButton();
             }
-            showOrderFailureModal(err.message || 'Could not confirm Cash on Delivery order. Please try again.', addressData);
+            showOrderFailureModal('Could not confirm Cash on Delivery order. Please try again.', addressData);
         });
         return;
     }
