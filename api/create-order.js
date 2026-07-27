@@ -5,12 +5,8 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const razorpayKeyId = process.env.RAZORPAY_KEY_ID;
-  const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET;
-
-  if (!razorpayKeyId || !razorpayKeySecret) {
-    return res.status(500).json({ error: 'Razorpay environment keys are not configured.' });
-  }
+  const razorpayKeyId = process.env.RAZORPAY_KEY_ID || 'rzp_test_THfpFSuoIQ9PLN';
+  const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET || 'alq4lVCwZNTeutsmwwmYgpPm';
 
   try {
     const { amount, currency = 'INR', receipt, notes } = req.body || {};
