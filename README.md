@@ -5,8 +5,9 @@
   # ⏰ Simpliven™ Smart Digital LED Mirror Alarm Clock
   ### *The Next-Generation Single-Product High-Converting E-Commerce Experience*
 
-  [![Live Store](https://img.shields.io/badge/LIVE%20DEMO-mohammedjabir.me-059669?style=for-the-badge&logo=vercel&logoColor=white)](https://mohammedjabir.me)
+  [![Official Store](https://img.shields.io/badge/OFFICIAL%20STORE-simpliven.com-059669?style=for-the-badge&logo=shopify&logoColor=white)](https://simpliven.com/)
   [![GitHub Repo](https://img.shields.io/badge/GITHUB-simpliven--digital--alarm--clock-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/MohammedJabir18/simpliven-digital-alarm-clock)
+  [![Portfolio](https://img.shields.io/badge/PORTFOLIO-mohammedjabir.me-2563EB?style=for-the-badge&logo=google-chrome&logoColor=white)](https://mohammedjabir.me)
   [![License: MIT](https://img.shields.io/badge/LICENSE-MIT-10B981?style=for-the-badge&logo=open-source-initiative&logoColor=white)](./LICENSE)
   [![Buy Me A Coffee](https://img.shields.io/badge/BUY%20ME%20A%20COFFEE-Mohammed%20Jabir-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/mohammedjabir)
 
@@ -280,8 +281,11 @@ simpliven-digital-alarm-clock/
   *Senior Software Engineer • Full-Stack & E-Commerce Architect • UI/UX Specialist*
 
   <p align="center">
+    <a href="https://simpliven.com/" target="_blank">
+      <img src="https://img.shields.io/badge/Official%20Store-simpliven.com-059669?style=for-the-badge&logo=shopify&logoColor=white" />
+    </a>
     <a href="https://mohammedjabir.me" target="_blank">
-      <img src="https://img.shields.io/badge/Portfolio-mohammedjabir.me-059669?style=for-the-badge&logo=google-chrome&logoColor=white" />
+      <img src="https://img.shields.io/badge/Portfolio-mohammedjabir.me-2563EB?style=for-the-badge&logo=google-chrome&logoColor=white" />
     </a>
     <a href="https://github.com/MohammedJabir18" target="_blank">
       <img src="https://img.shields.io/badge/GitHub-MohammedJabir18-181717?style=for-the-badge&logo=github&logoColor=white" />
