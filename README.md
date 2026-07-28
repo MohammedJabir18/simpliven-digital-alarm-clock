@@ -252,6 +252,27 @@ simpliven-digital-alarm-clock/
 
 ---
 
+## 📚 Comprehensive Technical Documentation Handbook
+
+For developers, architects, and technical contributors working on **Simpliven™**, the complete production-grade **Technical Documentation Handbook** covers all architectural, implementation, testing, and deployment standards across 10 core sections:
+
+1. **[Product Overview & Value Proposition](#1-product-overview--value-proposition)**: Product USPs, target audience personas, LED mirror telemetry features, and mobile UX goals.
+2. **[System Architectural Blueprint & Tech Stack](#2-system-architectural-blueprint--tech-stack)**: Full Mermaid.js architecture diagrams, RSC vs client state flow, and tech stack rationale.
+3. **[Development Environment & Workflow](#3-development-environment--workflow)**: Step-by-step `pnpm` setup, `.env.local` variable vault catalog, trunk-based branching, and Conventional Commits.
+4. **[Frontend Implementation & Component Architecture](#4-frontend-implementation--component-architecture)**: Directory mapping, Tailwind CSS tokens, TypeScript specs for `ProductMirrorCustomizer`, `InteractiveButton`, and `ModalDrawer`.
+5. **[Backend Integration & Security Protocols](#5-backend-integration--security-protocols)**: Razorpay UPI & COD sequence diagrams, HMAC-SHA256 signature verification code, and CSP header policies.
+6. **[Design System & Accessibility (a11y)](#6-design-system--accessibility-a11y)**: WCAG AAA color contrast validation, spatial tokens, keyboard accessibility, and high-visibility display mode.
+7. **[Performance Engineering & Optimization](#7-performance-engineering--optimization)**: Core Web Vitals budgets (LCP < 1.2s, INP < 100ms, CLS < 0.05), Next Image optimization, and main-thread execution strategy.
+8. **[QA & Testing Methodology](#8-qa--testing-methodology)**: Vitest unit testing suites, Playwright E2E purchase flow tests, and bug triage matrix.
+9. **[Deployment Pipeline & Infrastructure](#9-deployment-pipeline--infrastructure)**: Production GitHub Actions CI/CD pipeline (`.github/workflows/ci-cd.yml`) and Vercel Edge Serverless hosting.
+10. **[FAQs & Troubleshooting](#10-faqs-edge-cases--troubleshooting)**: Diagnostic protocols for SSR hydration mismatches, GSAP mobile Safari lag, and Razorpay webhook authentication.
+
+> [!NOTE]
+> View the complete standalone documentation handbook file: [`simpliven_technical_documentation.md`](file:///C:/Users/jabir/.gemini/antigravity/brain/12a2f448-aa6c-40df-a87d-558a680b3614/simpliven_technical_documentation.md).
+
+
+---
+
 ## ⚡ Performance Benchmarks
 
 ```
