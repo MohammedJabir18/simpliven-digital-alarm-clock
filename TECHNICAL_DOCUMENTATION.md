@@ -114,8 +114,8 @@ pnpm dev
 
 ### 3.2 Environment Variables Catalog (`.env.local`)
 
-> **🔒 Note:** All secret values below are redacted placeholders. For real credentials,
-> see the local-only copy: `TECHNICAL_DOCUMENTATION.local.md` (git-ignored).
+> **🔒 Note:** All secret values below are redacted placeholders.
+> Copy `.env.example` to `.env.local` and replace with your own credentials before running the project.
 
 ```env
 # Client-Facing Variables (Exposed to Browser)
