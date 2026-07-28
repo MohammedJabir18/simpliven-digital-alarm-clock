@@ -32,6 +32,9 @@ build/
 .env.production
 .env.development
 
+# Confidential documentation (contains real API keys & secrets)
+TECHNICAL_DOCUMENTATION.local.md
+
 # Shopify credential files
 shopify.config.local.js
 shopify.private.js

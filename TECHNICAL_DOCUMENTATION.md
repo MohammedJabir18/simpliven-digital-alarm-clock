@@ -114,21 +114,24 @@ pnpm dev
 
 ### 3.2 Environment Variables Catalog (`.env.local`)
 
+> **🔒 Note:** All secret values below are redacted placeholders. For real credentials,
+> see the local-only copy: `TECHNICAL_DOCUMENTATION.local.md` (git-ignored).
+
 ```env
 # Client-Facing Variables (Exposed to Browser)
 NEXT_PUBLIC_SITE_URL="http://localhost:3000"
-NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN="simpliven-official.myshopify.com"
-NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN="ab12cd34ef567890gh12ij34kl567890"
-NEXT_PUBLIC_RAZORPAY_KEY_ID="rzp_test_9876543210ABCD"
+NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN="your-store.myshopify.com"
+NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN="your_storefront_access_token_here"
+NEXT_PUBLIC_RAZORPAY_KEY_ID="rzp_test_your_key_id_here"
 NEXT_PUBLIC_ENABLE_MIRROR_VISUALIZER="true"
 
 # Server-Only Variables (Secret Key Vault)
-SHOPIFY_ADMIN_API_ACCESS_TOKEN="shpat_REPLACE_WITH_YOUR_ADMIN_API_TOKEN"
-RAZORPAY_KEY_SECRET="SecretRazorpayKey98765"
-RAZORPAY_WEBHOOK_SECRET="whsec_HmacSignatureSecretKey12345"
-DATABASE_URL="postgresql://postgres:Password123@db.supabase.co:5432/simpliven"
-SMS_GATEWAY_API_KEY="fast2sms_api_key_live_abc123xyz"
-SENTRY_AUTH_TOKEN="sentry_token_9988776655"
+SHOPIFY_ADMIN_API_ACCESS_TOKEN="shpat_your_admin_api_token_here"
+RAZORPAY_KEY_SECRET="your_razorpay_key_secret_here"
+RAZORPAY_WEBHOOK_SECRET="your_razorpay_webhook_secret_here"
+DATABASE_URL="postgresql://user:password@your-db-host:5432/your_database"
+SMS_GATEWAY_API_KEY="your_sms_gateway_api_key_here"
+SENTRY_AUTH_TOKEN="your_sentry_auth_token_here"
 ```
 
 ### 3.3 Git Branching Strategy & Workflow
